@@ -7,6 +7,12 @@
     android:background="#FFFFFF"
     tools:context=".Choice" >
 
+    <com.example.runninggame.Game
+        android:id="@+id/game"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
     <TextView
         android:id="@+id/score_text_view"
         android:layout_width="match_parent"
