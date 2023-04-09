@@ -16,11 +16,11 @@ public class MainActivity extends AppCompatActivity {
 
     private Button bt_m_play;
     private MediaPlayer mediaPlayer;
-    private Animation jumpAnimation;
-    private Animation translateAnimation;
+    private AnimationSet animationSet;
     private ImageView character;
     private View nextButton;
     private int screenWidth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,44 +32,19 @@ public class MainActivity extends AppCompatActivity {
         nextButton.setVisibility(View.INVISIBLE);
         bt_m_play = findViewById(R.id.bt_Play);
 
-
+        // 캐릭터를 처음에 화면에 보이도록 설정합니다.
+        character.setVisibility(View.INVISIBLE);
 
         bt_m_play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                character.setVisibility(View.VISIBLE);
                 jumpAndTranslate();
             }
         });
 
         screenWidth = getResources().getDisplayMetrics().widthPixels;
 
-        jumpAnimation = AnimationUtils.loadAnimation(this, R.anim.jump_animation);
-        translateAnimation = AnimationUtils.loadAnimation(this, R.anim.translate_animation);
-        AnimationSet animationSet = new AnimationSet(false);
-        animationSet.addAnimation(jumpAnimation);
-        animationSet.addAnimation(translateAnimation);
-        animationSet.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {}
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                nextButton.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {}
-        });
-
-        mediaPlayer = MediaPlayer.create(this, R.raw.sillychipsong);
-        mediaPlayer.setLooping(true);
-    }
-
-    private void jumpAndTranslate() {
-        AnimationSet animationSet = new AnimationSet(false);
-        animationSet.addAnimation(jumpAnimation);
-        animationSet.addAnimation(translateAnimation);
+        animationSet = (AnimationSet) AnimationUtils.loadAnimation(this, R.anim.jump_translate);
         animationSet.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -84,24 +59,38 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAnimationRepeat(Animation animation) {}
         });
+
+        mediaPlayer = MediaPlayer.create(this, R.raw.sillychipsong);
+        mediaPlayer.setLooping(true);
+    }
+
+
+    private void jumpAndTranslate() {
         character.startAnimation(animationSet);
     }
 
     protected void onResume() {
         super.onResume();
-        mediaPlayer.start();
+        if (mediaPlayer != null) {
+            mediaPlayer.start();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mediaPlayer.stop();
+        if (mediaPlayer != null) {
+            mediaPlayer.pause();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mediaPlayer.release();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 
     public void onClickNEXT(View view) {
