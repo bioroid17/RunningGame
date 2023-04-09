@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillAfter="true"
+    android:interpolator="@android:anim/accelerate_decelerate_interpolator">
+    <!--캐릭터 이동-->
+    <translate
+        android:duration="3000"
+        android:fromXDelta="0%"
+        android:toXDelta="1000" />
+    <!--첫 번째 점프-->
+    <set android:startOffset="750">
+        <translate
+            android:duration="500"
+            android:fromYDelta="0%"
+            android:toYDelta="-30%" />
+        <translate
+            android:duration="500"
+            android:startOffset="500"
+            android:fromYDelta="-30%"
+            android:toYDelta="0%" />
+    </set>
+    <!--두 번째 점프-->
+    <set android:startOffset="1750">
+        <translate
+            android:duration="500"
+            android:fromYDelta="0%"
+            android:toYDelta="-30%" />
+        <translate
+            android:duration="500"
+            android:startOffset="500"
+            android:fromYDelta="-30%"
+            android:toYDelta="0%" />
+    </set>
+</set>
