@@ -1,4 +1,4 @@
-package com.example.runninggame;
+/*package com.example.runninggame;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -169,3 +169,4 @@ public class Game extends View {
         }
     }
 }
+*/

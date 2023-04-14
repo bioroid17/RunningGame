@@ -3,6 +3,7 @@ package com.example.runninggame;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.view.View;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -24,12 +25,20 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
 
         // 앱 실행 시 화면을 가로 방향으로 출력
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         character = findViewById(R.id.character);
         nextButton = findViewById(R.id.nextButton);
