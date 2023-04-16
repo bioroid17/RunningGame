@@ -3,16 +3,24 @@ package com.example.runninggame;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 public class Choice extends AppCompatActivity {
@@ -30,14 +38,23 @@ public class Choice extends AppCompatActivity {
     private float groundY; //가운데 땅의 중간 Y좌표값
     private RectF playerRect;
     private RectF groundRect;
-    private float jumpHeight = 80f; //점프 첫속도 (점프 높이)
+    private float jumpHeight = 65f; //점프 첫속도 (점프 높이)
     private float gravity = 6f; //중력크기
     private boolean isJumping = false; //false일때 점프 가능
     private float translateY = 0; //플레이어 Y값 변경
     private boolean isreversal = false; //true면 반전상태
     private float playerY; // 플레이어의 중간 Y좌표값
 
-    private Handler handler = new Handler(Looper.getMainLooper());
+
+    private int gashiNum = 0; //풀 안의 몇번째 가시를 꺼내쓸건지
+    private int removeGashiNum = 0;
+    private float objectSpeed = 30; //가시와 발판 스피드
+
+    private List<ImageView> gashiPool = new ArrayList<>(); //가시 풀
+    private List<ImageView> gashiList = new ArrayList<>(); //인스턴스 가시 리스트
+
+
+    private Handler gamehandler = new Handler(Looper.getMainLooper());
     private Runnable gameRunnable = new Runnable() {
         @Override
         public void run() {
@@ -45,9 +62,29 @@ public class Choice extends AppCompatActivity {
             rectSetting();
             GroundCollisionCheck();
 
-            handler.postDelayed(this, 10);
+            gamehandler.postDelayed(this, 1);
         }
     };
+
+    private Handler moveHandler = new Handler();
+    private Runnable moveObjects = new Runnable() {
+        @Override
+        public void run() {
+            for(ImageView gashi : gashiPool){
+                if(gashi.getVisibility() == View.VISIBLE)
+                    if(gashi.getX() + gashi.getWidth() - objectSpeed < 0)
+                        removeGashi(gashi);
+                    else
+                        gashi.setX(gashi.getX() - objectSpeed);
+            }
+
+            moveHandler.postDelayed(this, 1);
+        }
+    };
+
+    private int screenWidth;
+
+
 
     ///////////////
     @Override
@@ -56,6 +93,10 @@ public class Choice extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_choice);
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        screenWidth = displayMetrics.widthPixels;
+
         scoreTextView = findViewById(R.id.score_text_view);
         startTimer();
 
@@ -63,13 +104,24 @@ public class Choice extends AppCompatActivity {
 
         player = findViewById(R.id.player);
         ground = findViewById(R.id.ground);
-        groundY = ground.getY() + ground.getHeight() / 2f; //땅 Y값의 중간값
 
         groundRect = new RectF(ground.getLeft(), ground.getTop(), ground.getRight(), ground.getBottom());
 
+        for(int i = 0; i < 100; i++)
+            createGashi();
 
+        gamehandler.post(gameRunnable);
+        moveHandler.post(moveObjects);
+    }
 
-        handler.post(gameRunnable);
+    protected void onResume(){
+        super.onResume();
+        ground.post(new Runnable() { //ground가 그려진 후 위치 설정.
+            @Override
+            public void run() {
+                groundY = ground.getY() + ground.getHeight() / 2f; //땅 Y값의 중간값
+            }
+        });
     }
 
     private void startTimer() {
@@ -131,16 +183,22 @@ public class Choice extends AppCompatActivity {
     }
 
     private void reversal(){ //반전 눌렀을때 값들 반전됨
-
         playerY = player.getY() + player.getHeight() / 2f;
-        groundY = ground.getY() + ground.getHeight() / 2f;
 
-        if(!isreversal) isreversal = true;
-        else isreversal = false;
-
+        if(!isreversal) {
+            isreversal = true;
+            player.setY((playerY - ((playerY - groundY) * 2)) - player.getHeight()/2);
+            player.setRotationX(180);
+        }
+        else{
+            isreversal = false;
+            player.setY((playerY - ((playerY - groundY) * 2)) - player.getHeight()/2);
+            player.setRotationX(0);
+        }
+/*
         if(playerY - groundY > 0) player.setY((playerY - ((playerY - groundY) * 2)) - player.getHeight()/2);
         else player.setY((playerY - ((playerY - groundY) * 2)) - player.getHeight()/2);
-
+*/
         translateY *= -1;
 
     }
@@ -163,8 +221,74 @@ public class Choice extends AppCompatActivity {
             reversal();
             return true;
         }
+        if(keyCode == KeyEvent.KEYCODE_W){
+            spawnGashi(gashiNum, 0, false); //false = 똑바로 소환
+            return true;
+        }
+        if(keyCode == KeyEvent.KEYCODE_E){
+            spawnGashi(gashiNum, 0, true); //true = 거꾸로 소환
+            return true;
+        }
+        if(keyCode == KeyEvent.KEYCODE_Q){
+            spawnGashi(gashiNum, 200, false);
+            return true;
+        }
+        if(keyCode == KeyEvent.KEYCODE_R){
+            spawnGashi(gashiNum, 200, true);
+            return true;
+        }
         return super.onKeyDown(keyCode, event);
     }
+
+
+    private void createGashi(){
+        ImageView gashi = new ImageView(this);
+        gashi.setImageResource(R.drawable.triangle);
+
+        //gashi.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+        gashi.setLayoutParams(new ViewGroup.LayoutParams(200, 200));
+
+        gashiPool.add(gashi);
+        gashi.setVisibility(View.INVISIBLE);
+        //addContentView(gashi, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)); // 이 부분이 추가되었습니다.
+        ((ViewGroup)findViewById(android.R.id.content)).addView(gashi); // 부모 뷰를 지정해줍니다.
+
+    }
+    private ImageView spawnGashi(int i, int y, boolean isreversal){
+        ImageView gashi = gashiPool.get(i);
+        gashi.setVisibility(View.VISIBLE);
+        gashi.setX(screenWidth + gashiPool.get(i).getWidth());
+
+        if(isreversal) { //아래쪽에서 가시 나옴
+            gashi.setRotationX(180);
+
+            gashi.setY(groundY + y);//가시 이미지 수정후 수정
+            //gashi.setY(groundY + ground.getHeight() / 2f + y);
+        }
+        else {
+            gashi.setRotationX(0);
+//아래코드 가시 이미지 수정후 수정
+            gashi.setY(groundY - gashiPool.get(i).getHeight() - y);
+            //gashi.setY(groundY - gashiPool.get(i).getHeight() - ground.getHeight() / 2f - y);
+        }
+
+        gashiNum++;
+        if(gashiNum >= gashiPool.size()) gashiNum = 0;
+
+        return gashi;
+    }
+
+
+    private void removeGashi(final ImageView gashi){
+
+        gashi.setVisibility(View.INVISIBLE);
+        Log.d("Debug", "tkfkwla!");
+
+    }
+
+
+
+
 
 
 }
