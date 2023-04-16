@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 public class Choice extends AppCompatActivity {
@@ -51,16 +53,21 @@ public class Choice extends AppCompatActivity {
     private float objectSpeed = 30; //가시와 발판 스피드
 
     private List<ImageView> gashiPool = new ArrayList<>(); //가시 풀
-    private List<ImageView> gashiList = new ArrayList<>(); //인스턴스 가시 리스트
+    private List<Boolean> pR = new ArrayList<>(); //위쪽에 나올거면 False, 아래쪽에 나올거면 True
+    private List<Integer> pY = new ArrayList<>(); //가시와 발판의 Y좌표
+    private List<Float> pT = new ArrayList<>(); //다음 가시or발판이 나오기까지 대기시간
 
+    int patternNum;
 
     private Handler gamehandler = new Handler(Looper.getMainLooper());
     private Runnable gameRunnable = new Runnable() {
         @Override
         public void run() {
-            Gravity();
-            rectSetting();
-            GroundCollisionCheck();
+            if(!isPaused) {
+                Gravity();
+                rectSetting();
+                GroundCollisionCheck();
+            }
 
             gamehandler.postDelayed(this, 1);
         }
@@ -70,18 +77,49 @@ public class Choice extends AppCompatActivity {
     private Runnable moveObjects = new Runnable() {
         @Override
         public void run() {
-            for(ImageView gashi : gashiPool){
-                if(gashi.getVisibility() == View.VISIBLE)
-                    if(gashi.getX() + gashi.getWidth() - objectSpeed < 0)
-                        removeGashi(gashi);
-                    else
-                        gashi.setX(gashi.getX() - objectSpeed);
+            if(!isPaused) {
+                for (ImageView gashi : gashiPool) {
+                    if (gashi.getVisibility() == View.VISIBLE)
+                        if (gashi.getX() + gashi.getWidth() - objectSpeed < 0)
+                            removeGashi(gashi);
+                        else
+                            gashi.setX(gashi.getX() - objectSpeed);
+                }
             }
 
             moveHandler.postDelayed(this, 1);
         }
     };
 
+
+    int patternRunI = 0; //일단 임시로 생성
+    private Handler patternHandler = new Handler();
+
+    private Runnable patternRun = new Runnable() {
+        @Override
+        public void run() {
+
+            if(patternRunI < pR.size()){
+                spawnGashi(pY.get(patternRunI), pR.get(patternRunI));
+                patternHandler.postDelayed(this, 100);
+                //patternHandler.postDelayed(this, (int)(pT.get(patternRunI)*1000));
+                patternRunI++;
+            } else {
+                nextPatternHandler.postDelayed(nextPattern, 2000);
+            }
+        }
+    };
+    private Handler nextPatternHandler = new Handler();
+    private Runnable nextPattern = new Runnable() {
+        @Override
+        public void run() {
+            patternRunI = 0;
+            pY.clear();
+            pR.clear();
+            pT.clear();
+            pattern();
+        }
+    };
     private int screenWidth;
 
 
@@ -112,6 +150,7 @@ public class Choice extends AppCompatActivity {
 
         gamehandler.post(gameRunnable);
         moveHandler.post(moveObjects);
+        moveHandler.postDelayed(nextPattern, 2000);
     }
 
     protected void onResume(){
@@ -213,29 +252,31 @@ public class Choice extends AppCompatActivity {
 
 
     public boolean onKeyDown(int keyCode, KeyEvent event){
-        if(keyCode == KeyEvent.KEYCODE_Z){
-            jump();
-            return true;
-        }
-        if(keyCode == KeyEvent.KEYCODE_X){
-            reversal();
-            return true;
-        }
-        if(keyCode == KeyEvent.KEYCODE_W){
-            spawnGashi(gashiNum, 0, false); //false = 똑바로 소환
-            return true;
-        }
-        if(keyCode == KeyEvent.KEYCODE_E){
-            spawnGashi(gashiNum, 0, true); //true = 거꾸로 소환
-            return true;
-        }
-        if(keyCode == KeyEvent.KEYCODE_Q){
-            spawnGashi(gashiNum, 200, false);
-            return true;
-        }
-        if(keyCode == KeyEvent.KEYCODE_R){
-            spawnGashi(gashiNum, 200, true);
-            return true;
+        if(!isPaused) {
+            if (keyCode == KeyEvent.KEYCODE_Z) {
+                jump();
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_X) {
+                reversal();
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_W) {
+                spawnGashi(0, false); //false = 똑바로 소환
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_E) {
+                spawnGashi(0, true); //true = 거꾸로 소환
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_Q) {
+                spawnGashi(200, false);
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_R) {
+                spawnGashi(200, true);
+                return true;
+            }
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -254,10 +295,10 @@ public class Choice extends AppCompatActivity {
         ((ViewGroup)findViewById(android.R.id.content)).addView(gashi); // 부모 뷰를 지정해줍니다.
 
     }
-    private ImageView spawnGashi(int i, int y, boolean isreversal){
-        ImageView gashi = gashiPool.get(i);
+    private ImageView spawnGashi(int y, boolean isreversal){
+        ImageView gashi = gashiPool.get(gashiNum);
         gashi.setVisibility(View.VISIBLE);
-        gashi.setX(screenWidth + gashiPool.get(i).getWidth());
+        gashi.setX(screenWidth + gashiPool.get(gashiNum).getWidth());
 
         if(isreversal) { //아래쪽에서 가시 나옴
             gashi.setRotationX(180);
@@ -268,7 +309,7 @@ public class Choice extends AppCompatActivity {
         else {
             gashi.setRotationX(0);
 //아래코드 가시 이미지 수정후 수정
-            gashi.setY(groundY - gashiPool.get(i).getHeight() - y);
+            gashi.setY(groundY - gashiPool.get(gashiNum).getHeight() - y);
             //gashi.setY(groundY - gashiPool.get(i).getHeight() - ground.getHeight() / 2f - y);
         }
 
@@ -287,9 +328,48 @@ public class Choice extends AppCompatActivity {
     }
 
 
+    public int patternDrawing(int min, int max) { //랜덤으로 패턴 뽑아오기
+        Random random = new Random();
+        return random.nextInt(max - min + 1) + min; //(0, 패턴의 수 - 1)로 호출
+    }
+
+    private void patternSet(boolean r, int y, float t){
+        pR.add(r);
+        pY.add(y);
+        pT.add(t);
+
+    }
 
 
+    private void pattern(){
+        patternNum = patternDrawing(0,1);
+
+        //patternNum = 0;
+
+        switch (patternNum){
+            case 0:
+                patternSet(false,0,.1f);
+                patternSet(false,0,.1f);
+                patternSet(false,0,.1f);
+                patternSet(false,0,.1f);
+                patternSet(false,0,.1f);
+                break;
+            case 1:
+                patternSet(true,0,.1f);
+                patternSet(true,0,.1f);
+                patternSet(true,0,.1f);
+                patternSet(true,0,.1f);
+                patternSet(true,0,.1f);
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+        }
+
+        patternHandler.post(patternRun);
 
 
+    }
 }
 
