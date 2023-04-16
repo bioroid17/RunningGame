@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Point;
+import android.os.Handler;
+import android.view.Display;
 import android.view.View;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -11,8 +14,10 @@ import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +42,45 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
 
+        // TextView 객체를 참조합니다.
+        TextView textView = findViewById(R.id.my_text_view);
+        textView.setAlpha(0);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                textView.setAlpha(1);
+                Animation animation = new TranslateAnimation(0, 0, -100, 0);
+                animation.setDuration(700);
+                textView.startAnimation(animation);
+            }
+        }, 1500);
+
+        ImageView imageView = findViewById(R.id.sound_set);
+
+// 이미지가 처음에 보이지 않도록 visibility 속성을 INVISIBLE로 설정합니다.
+        imageView.setVisibility(View.INVISIBLE);
+
+// ImageView가 이동할 위치를 계산합니다.
+        float x = (float)(getWindowManager().getDefaultDisplay().getWidth() - imageView.getWidth());
+        float y = imageView.getY();
+
+// 1초 후에 애니메이션을 실행합니다.
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // ImageView가 이동할 애니메이션을 정의합니다.
+                TranslateAnimation animation = new TranslateAnimation(x, imageView.getX(), y, y);
+                animation.setDuration(1000);
+
+                // 애니메이션을 ImageView에 적용합니다.
+                imageView.setVisibility(View.VISIBLE);
+                imageView.startAnimation(animation);
+            }
+        }, 1000);
+
+        TextView blinkingTextView = findViewById(R.id.blinktext);
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.blink);
+        blinkingTextView.startAnimation(anim);
         // 앱 실행 시 화면을 가로 방향으로 출력
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
