@@ -101,8 +101,10 @@ public class Choice extends AppCompatActivity {
 
             if(patternRunI < pR.size()){
                 spawnGashi(pY.get(patternRunI), pR.get(patternRunI));
-                patternHandler.postDelayed(this, 100);
-                //patternHandler.postDelayed(this, (int)(pT.get(patternRunI)*1000));
+                if(pT.get(patternRunI) != 0)
+                    patternHandler.postDelayed(this, (int)(pT.get(patternRunI)*1000));
+                else
+                    patternHandler.post(this);
                 patternRunI++;
             } else {
                 nextPatternHandler.postDelayed(nextPattern, 2000);
@@ -319,6 +321,31 @@ public class Choice extends AppCompatActivity {
         return gashi;
     }
 
+    //다른 방식의 장애물 생성 테스트
+    private void SpawnGashi(){
+        float x = screenWidth + gashiPool.get(gashiNum).getWidth();
+        for(int i = 0; i < pY.size(); i++){
+            ImageView gashi = gashiPool.get(gashiNum);
+            gashi.setVisibility(View.VISIBLE);
+            gashi.setX(x);
+            x += pT.get(i);
+            if(pR.get(i)){
+                gashi.setRotationX(180);
+
+                gashi.setY(groundY + pY.get(i));//가시 이미지 수정후 수정
+            } else{
+                gashi.setRotationX(0);
+//아래코드 가시 이미지 수정후 수정
+                gashi.setY(groundY - gashiPool.get(gashiNum).getHeight() - pY.get(i));
+            }
+
+            gashiNum++;
+            if(gashiNum >= gashiPool.size()) gashiNum = 0;
+        }
+        nextPatternHandler.postDelayed(nextPattern, 3000);
+    }
+
+
 
     private void removeGashi(final ImageView gashi){
 
@@ -348,18 +375,28 @@ public class Choice extends AppCompatActivity {
 
         switch (patternNum){
             case 0:
-                patternSet(false,0,.1f);
-                patternSet(false,0,.1f);
-                patternSet(false,0,.1f);
-                patternSet(false,0,.1f);
-                patternSet(false,0,.1f);
+                patternSet(true,0,0);
+                patternSet(false,0,200);
+                patternSet(true,0,0);
+                patternSet(false,0,200);
+                patternSet(true,0,0);
+                patternSet(false,0,200);
+                patternSet(true,0,0);
+                patternSet(false,0,200);
+                patternSet(true,0,0);
+                patternSet(false,0,200);
                 break;
             case 1:
-                patternSet(true,0,.1f);
-                patternSet(true,0,.1f);
-                patternSet(true,0,.1f);
-                patternSet(true,0,.1f);
-                patternSet(true,0,.1f);
+                patternSet(false,0,0);
+                patternSet(true,0,300);
+                patternSet(false,0,0);
+                patternSet(true,0,300);
+                patternSet(false,0,0);
+                patternSet(true,0,300);
+                patternSet(false,0,0);
+                patternSet(true,0,300);
+                patternSet(false,0,0);
+                patternSet(true,0,300);
                 break;
             case 2:
                 break;
@@ -367,7 +404,8 @@ public class Choice extends AppCompatActivity {
                 break;
         }
 
-        patternHandler.post(patternRun);
+        //patternHandler.post(patternRun);
+        SpawnGashi();
 
 
     }

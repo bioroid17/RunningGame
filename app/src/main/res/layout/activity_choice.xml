@@ -37,8 +37,12 @@
         android:id="@+id/player"
         android:layout_width="61dp"
         android:layout_height="69dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginStart="37dp"
+        android:layout_marginTop="122dp"
         android:layout_marginEnd="633dp"
         android:layout_marginBottom="221dp"
         app:srcCompat="@drawable/character" />
