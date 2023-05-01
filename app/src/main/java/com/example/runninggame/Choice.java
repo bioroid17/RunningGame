@@ -55,6 +55,7 @@ public class Choice extends AppCompatActivity {
     private int gashiNum = 0; //풀 안의 몇번째 가시를 꺼내쓸건지
     //private int removeGashiNum = 0;
     private List<ImageView> gashiPool = new ArrayList<>(); //가시 풀
+    private int gashiPoolSize = 0; //풀을 효율적으로 관리하기 위한 변수
     private List<Boolean> gR = new ArrayList<>(); //위쪽에 나올거면 False, 아래쪽에 나올거면 True
     private List<Integer> gY = new ArrayList<>(); //가시와 발판의 Y좌표
     private List<Float> gT = new ArrayList<>(); //다음 가시or발판이 나오기까지 대기시간(거리)
@@ -62,6 +63,7 @@ public class Choice extends AppCompatActivity {
 
     private int platNum = 0;
     private List<ImageView> platPool = new ArrayList<>();
+    private int platPoolSize = 0; //풀을 효율적으로 관리하기 위한 변수
     private List<Boolean> pR = new ArrayList<>();
     private List<Integer> pY = new ArrayList<>();
     private List<Float> pT = new ArrayList<>();
@@ -174,10 +176,12 @@ public class Choice extends AppCompatActivity {
 
         for(int i = 0; i < 100; i++) {
             createGashi();
+            gashiPoolSize++;
         }
 
         for(int i = 0; i < 20; i++){
             createPlatform();
+            platPoolSize++;
         }
 
         gamehandler.post(gameRunnable);
@@ -482,7 +486,6 @@ public class Choice extends AppCompatActivity {
     private void removeGashi(final ImageView gashi){
 
         gashi.setVisibility(View.INVISIBLE);
-        //Log.d("Debug", "tkfkwla!");
     }
     private void removePlatform(final ImageView platform){
         platform.setVisibility(View.INVISIBLE);
@@ -559,5 +562,11 @@ public class Choice extends AppCompatActivity {
 
 
     }
-}
+}//이제 해야할게.... 가시 위아래 변형시키는거랑... 좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.
+//발판 길이도 수정할 수 있는 코드를 짜면 좋긋다//
+
+// 오브젝트 풀도 좀더 효율적으로. 모든 풀을 매번 VISIBLE인지 검사하지 말고, 소환된 오브젝트만 검사하도록
+// 방안 a와 b를 만들어, 소환 시, 변수 b를 증가시키고 리무브 시 변수 a를 증가시킨다.
+// a < b일 경우, (a <= i < b) 만 스캔
+// b < a일 경우, (a <= i < size || 0 <= i < b) 만 스캔. // (i >= size)일 경우, i = 0 .
 
