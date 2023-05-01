@@ -283,10 +283,8 @@ public class Choice extends AppCompatActivity {
                         while (RectF.intersects(playerRect, platRect.get(i))) {
                             if (!isreversal) {
                                 player.offsetTopAndBottom(-1);
-                                //ii++;
                             } else {
                                 player.offsetTopAndBottom(1);
-                                //ii++;
                             }
 
                             rectSetting();
