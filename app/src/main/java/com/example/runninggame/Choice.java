@@ -35,6 +35,8 @@ public class Choice extends AppCompatActivity {
 
     ////////////////
 
+    private ImageView instance;
+
     public ImageView player;
     public int playerSize = 70; //플레이어 크기
     public int gashiSize = 100; //가시 크기
@@ -58,6 +60,8 @@ public class Choice extends AppCompatActivity {
     //private int removeGashiNum = 0;
     private List<ImageView> gashiPool = new ArrayList<>(); //가시 풀
     private int gashiPoolSize = 0; //풀을 효율적으로 관리하기 위한 변수
+    private int gashiPoolStart = 0; //풀에서 소환된 오브젝트들의 처음 (풀 효율을 위한 것)
+    private int gashiPoolEnd = 0; //풀에서 소환된 오브젝트들의 끝 (풀 효율을 위한 것)
     private List<Boolean> gR = new ArrayList<>(); //위쪽에 나올거면 False, 아래쪽에 나올거면 True
     private List<Integer> gY = new ArrayList<>(); //가시와 발판의 Y좌표
     private List<Float> gT = new ArrayList<>(); //다음 가시or발판이 나오기까지 대기시간(거리)
@@ -66,6 +70,8 @@ public class Choice extends AppCompatActivity {
     private int platNum = 0;
     private List<ImageView> platPool = new ArrayList<>();
     private int platPoolSize = 0; //풀을 효율적으로 관리하기 위한 변수
+    private int platPoolStart = 0; //가시 스타트랑 동일
+    private int platPoolEnd = 0; //가시 엔드랑 동일
     private List<Boolean> pR = new ArrayList<>();
     private List<Integer> pY = new ArrayList<>();
     private List<Float> pT = new ArrayList<>();
@@ -94,49 +100,53 @@ public class Choice extends AppCompatActivity {
         @Override
         public void run() {
             if(!isPaused) {
-                for (ImageView gashi : gashiPool) {
-                    if (gashi.getVisibility() == View.VISIBLE)
-                        if (gashi.getX() + gashi.getWidth() - objectSpeed < 0)
-                            removeGashi(gashi);
-                        else
-                            gashi.setX(gashi.getX() - objectSpeed);
+                if(gashiPoolStart < gashiPoolEnd) {
+                    for(int i = gashiPoolStart; i < gashiPoolEnd; i++){
+                        gashiMove(i);
+                    }
+                } else if(gashiPoolStart > gashiPoolEnd){
+                    for(int i = gashiPoolStart; i < gashiPoolSize; i++) {
+                        gashiMove(i);
+                    }
+                    for(int i = 0; i < gashiPoolEnd; i++){
+                        gashiMove(i);
+                    }
                 }
-                for(ImageView platform : platPool){
-                    if(platform.getVisibility() == View.VISIBLE)
-                       if (platform.getX() + platform.getWidth() - objectSpeed < 0)
-                            removePlatform(platform);
-                       else
-                            platform.setX(platform.getX() - objectSpeed);
+
+                if(platPoolStart < platPoolEnd) {
+                    for(int i = platPoolStart; i < platPoolEnd; i++){
+                        platMove(i);
+                    }
+                } else if(platPoolStart > platPoolEnd){
+                    for(int i = platPoolStart; i < platPoolSize; i++) {
+                        platMove(i);
+                    }
+                    for(int i = 0; i < platPoolEnd; i++){
+                        platMove(i);
+                    }
                 }
             }
 
             moveHandler.postDelayed(this, 1);
         }
     };
+    private void gashiMove(int i){
+        instance = gashiPool.get(i);
+        if(instance.getX() + instance.getWidth() - objectSpeed > 0)
+            instance.setX(instance.getX() - objectSpeed);
+        else
+            removeGashi(instance);
+    }
+    private void platMove(int i){
+        instance = platPool.get(i);
+        if(instance.getX() + instance.getWidth() - objectSpeed > 0)
+            instance.setX(instance.getX() - objectSpeed);
+        else
+            removePlatform(instance);
+    }
 
 
 
-    private Handler patternHandler = new Handler();
-/*
-    int patternRunI = 0; //일단 임시로 생성
-    private Runnable patternRun = new Runnable() {
-        @Override
-        public void run() {
-
-            if(patternRunI < gR.size()){
-                spawnGashi(gY.get(patternRunI), gR.get(patternRunI));
-                if(gT.get(patternRunI) != 0)
-                    patternHandler.postDelayed(this, (int)(gT.get(patternRunI)*1000));
-                else
-                    patternHandler.post(this);
-                patternRunI++;
-            } else {
-                nextPatternHandler.postDelayed(nextPattern, 2000);
-            }
-        }
-    };
-
- */
     private Handler nextPatternHandler = new Handler();
     private Runnable nextPattern = new Runnable() {
         @Override
@@ -214,7 +224,7 @@ public class Choice extends AppCompatActivity {
                 groundY = ground.getY() + ground.getHeight() / 2f; //땅 Y값의 중간값
                 player.setX(200); //플레이어 시작위치
                 player.setY(groundY - ground.getHeight()/2f - player.getHeight());
-
+                groundRect = new RectF(ground.getX(),ground.getY(),ground.getX() + ground.getWidth(), ground.getY() + ground.getHeight());
             }
         });
     }
@@ -259,18 +269,25 @@ public class Choice extends AppCompatActivity {
 
     private void rectSetting(){ //각자 렉트를 재설정
         playerRect = new RectF(player.getX(), player.getY(), player.getX() + player.getWidth(),player.getY() + player.getHeight());
-        if(!isreversal)
+        if(!isreversal) //플레이어의 머리 렉트
             playerHeadRect = new RectF(player.getX(), player.getY(), player.getX() + player.getWidth(), player.getY() + 5);
         else
             playerHeadRect = new RectF(player.getX(), player.getY()+player.getHeight()-5, player.getX()+player.getWidth(), player.getY()+player.getHeight());
-        groundRect = new RectF(ground.getX(),ground.getY(),ground.getX() + ground.getWidth(), ground.getY() + ground.getHeight());
-        for(int i = 0; i < platPool.size(); i++){
-            if(platPool.get(i).getVisibility() == View.VISIBLE) {
-                ImageView plat = platPool.get(i);
-                platRect.get(i).set(new RectF(plat.getX(), plat.getY(), plat.getX() + plat.getWidth(), plat.getY() + plat.getHeight()));
-            }
-        }
 
+        if(platPoolStart < platPoolEnd){
+            for(int i = platPoolStart; i < platPoolEnd; i++){
+                platRectSetting(i);
+            }
+        } else if(platPoolStart > platPoolEnd){
+            for(int i = platPoolStart; i < platPoolSize; i++)
+                platRectSetting(i);
+            for(int i = 0; i < platPoolEnd; i++)
+                platRectSetting(i);
+        }
+    }
+    private void platRectSetting(int i){
+        instance = platPool.get(i);
+        platRect.get(i).set(new RectF(instance.getX(), instance.getY(), instance.getX() + instance.getWidth(), instance.getY() + instance.getHeight()));
     }
 
     private void GroundCollisionCheck(){ //땅이랑 닿았는지 체크
@@ -285,38 +302,49 @@ public class Choice extends AppCompatActivity {
             isJumping = false; //점프 가능상태
             translateY = 0; //Y 0으로 고정
         }
-        for(int i = 0; i < platPool.size(); i++) {
-            if(platPool.get(i).getVisibility() == View.VISIBLE) {
-                if (RectF.intersects(playerRect, platRect.get(i))){
-                    //int ii = 0; // 땅에 닿았을 때 땅위로 이동하기위해 움직인 횟수 체크 (폐기)
 
-                    if(RectF.intersects(playerHeadRect, platRect.get(i))){
-                        while (RectF.intersects(playerRect,platRect.get(i))){
-                            if (!isreversal) {
-                                player.offsetTopAndBottom(1);
-                            } else {
-                                player.offsetTopAndBottom(-1);
-                            }
-                            rectSetting();
-                            //if(!RectF.intersects(playerRect,platRect.get(i))) continue;
+        if(platPoolStart < platPoolEnd){
+            for(int i = platPoolStart; i < platPoolEnd; i++){
+                platCollisionCheck(i);
+            }
+        } else if(platPoolStart > platPoolEnd){
+            for(int i = platPoolStart; i < platPoolSize; i++){
+                platCollisionCheck(i);
+            }
+            for(int i = 0; i < platPoolEnd; i++){
+                platCollisionCheck(i);
+            }
+        }
+    }
+    private void platCollisionCheck(int i){
+        if(platPool.get(i).getVisibility() == View.VISIBLE) {
+            if (RectF.intersects(playerRect, platRect.get(i))){
+
+                if(RectF.intersects(playerHeadRect, platRect.get(i))){
+                    while (RectF.intersects(playerRect,platRect.get(i))){
+                        if (!isreversal) {
+                            player.offsetTopAndBottom(1);
+                        } else {
+                            player.offsetTopAndBottom(-1);
                         }
-                        isJumping = true;
-                        translateY = 0;
-                    } else {
-                        while (RectF.intersects(playerRect, platRect.get(i))) {
-                            if (!isreversal) {
-                                player.offsetTopAndBottom(-1);
-                            } else {
-                                player.offsetTopAndBottom(1);
-                            }
-
-                            rectSetting();
-
-
-                        }
-                        isJumping = false;
-                        translateY = 0;
+                        rectSetting();
                     }
+                    isJumping = true;
+                    translateY = 0;
+                } else {
+                    while (RectF.intersects(playerRect, platRect.get(i))) {
+                        if (!isreversal) {
+                            player.offsetTopAndBottom(-1);
+                        } else {
+                            player.offsetTopAndBottom(1);
+                        }
+
+                        rectSetting();
+
+
+                    }
+                    isJumping = false;
+                    translateY = 0;
                 }
             }
         }
@@ -335,10 +363,7 @@ public class Choice extends AppCompatActivity {
             player.setY((playerY - ((playerY - groundY) * 2)) - player.getHeight()/2);
             player.setRotationX(0);
         }
-/*
-        if(playerY - groundY > 0) player.setY((playerY - ((playerY - groundY) * 2)) - player.getHeight()/2);
-        else player.setY((playerY - ((playerY - groundY) * 2)) - player.getHeight()/2);
-*/
+
         translateY *= -1;
 
     }
@@ -388,12 +413,10 @@ public class Choice extends AppCompatActivity {
         ImageView gashi = new ImageView(this);
         gashi.setImageResource(R.drawable.gashi);
 
-        //gashi.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
         gashi.setLayoutParams(new ViewGroup.LayoutParams(gashiSize, gashiSize));
 
         gashiPool.add(gashi);
         gashi.setVisibility(View.INVISIBLE);
-        //addContentView(gashi, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         ((ViewGroup)findViewById(android.R.id.content)).addView(gashi); // 부모 뷰를 지정
 
     }
@@ -407,7 +430,7 @@ public class Choice extends AppCompatActivity {
         plat.setLayoutParams(new ViewGroup.LayoutParams(200, 30));
 
         platPool.add(plat);
-        platRect.add(new RectF());  //이게 문제였다 씨이부랄!!!!!!@~!!
+        platRect.add(new RectF());
         plat.setVisibility(View.INVISIBLE);
         ((ViewGroup)findViewById(android.R.id.content)).addView(plat);
 
@@ -420,13 +443,11 @@ public class Choice extends AppCompatActivity {
         if(isreversal) { //아래쪽에서 가시 나옴
             gashi.setRotationX(180);
 
-            //gashi.setY(groundY + y);//가시 이미지 수정후 수정
             gashi.setY(groundY + ground.getHeight() / 2f + y);
         }
         else {
             gashi.setRotationX(0);
-//아래코드 가시 이미지 수정후 수정
-            //gashi.setY(groundY - gashiPool.get(gashiNum).getHeight() - y);
+
             gashi.setY(groundY - gashiPool.get(gashiNum).getHeight() - ground.getHeight() / 2f - y);
         }
 
@@ -438,13 +459,12 @@ public class Choice extends AppCompatActivity {
 
     //다른 방식의 장애물 생성 테스트
     private void SpawnGashi(){
-        //float gashiX = screenWidth + gashiPool.get(gashiNum).getWidth();
-        float gashiX = screenWidth + 100;
+        float X = screenWidth + 100;
         for(int i = 0; i < gY.size(); i++){
             ImageView gashi = gashiPool.get(gashiNum);
             gashi.setVisibility(View.VISIBLE);
-            gashi.setX(gashiX);
-            gashiX += gT.get(i);
+            gashi.setX(X);
+            X += gT.get(i);
             if(gR.get(i)){
                 gashi.setRotationX(180);
 
@@ -455,29 +475,34 @@ public class Choice extends AppCompatActivity {
                 gashi.setY(groundY - ground.getHeight()/2 - gashiPool.get(gashiNum).getHeight() - gY.get(i));
             }
 
+            gashiPoolEnd++;
+            if(gashiPoolEnd >= gashiPoolSize)
+                gashiPoolEnd = 0;
+
             gashiNum++;
-            if(gashiNum >= gashiPool.size()) gashiNum = 0;
+            if(gashiNum >= gashiPoolSize) gashiNum = 0;
         }
 
-        //float platX = screenWidth + platPool.get(platNum).getWidth();
-        float platX = screenWidth + 100;
+        X = screenWidth + 100;
         for(int i = 0; i < pY.size(); i++){
             ImageView platform = platPool.get(platNum);
             platform.setVisibility(View.VISIBLE);
-            platform.setX(platX);
-            platX += pT.get(i);
+            platform.setX(X);
+            X += pT.get(i);
             if(pR.get(i)){
                 platform.setY(groundY + ground.getHeight() + pY.get(i));
             } else{
                 platform.setY(groundY - ground.getHeight() - platPool.get(platNum).getHeight() - pY.get(i));
             }
 
+            platPoolEnd++;
+            if(platPoolEnd >= platPoolSize)
+                platPoolEnd = 0;
+
             platNum++;
-            if(platNum >= platPool.size())
+            if(platNum >= platPoolSize)
                 platNum = 0;
         }
-
-        nextPatternHandler.postDelayed(nextPattern, 3000);
     }
 
 
@@ -487,9 +512,21 @@ public class Choice extends AppCompatActivity {
     private void removeGashi(final ImageView gashi){
 
         gashi.setVisibility(View.INVISIBLE);
+        gashiPoolStart++;
+        if(gashiPoolStart >= gashiPoolSize)
+            gashiPoolStart = 0;
+
+        if(gashiPoolStart == gashiPoolEnd && platPoolStart == platPoolEnd) //전부 사라졌다면 다음 패턴 바로 호출
+            nextPatternHandler.post(nextPattern);
     }
     private void removePlatform(final ImageView platform){
         platform.setVisibility(View.INVISIBLE);
+        platPoolStart++;
+        if(platPoolStart >= platPoolSize)
+            platPoolStart = 0;
+
+        if(gashiPoolStart == gashiPoolEnd && platPoolStart == platPoolEnd) //전부 사라졌다면 다음 패턴 바로 호출
+            nextPatternHandler.post(nextPattern);
     }
 
 
@@ -566,9 +603,4 @@ public class Choice extends AppCompatActivity {
     }
 }//이제 해야할게.... 가시 위아래 변형시키는거랑... 좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.
 //발판 길이도 수정할 수 있는 코드를 짜면 좋긋다//
-
-// 오브젝트 풀도 좀더 효율적으로. 모든 풀을 매번 VISIBLE인지 검사하지 말고, 소환된 오브젝트만 검사하도록
-// 방안 a와 b를 만들어, 소환 시, 변수 b를 증가시키고 리무브 시 변수 a를 증가시킨다.
-// a < b일 경우, (a <= i < b) 만 스캔
-// b < a일 경우, (a <= i < size || 0 <= i < b) 만 스캔. // (i >= size)일 경우, i = 0 .
 
