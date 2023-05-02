@@ -40,6 +40,7 @@ public class Choice extends AppCompatActivity {
     public ImageView player;
     public int playerSize = 70; //플레이어 크기
     public int gashiSize = 100; //가시 크기
+    private int platSize = 30; //플랫폼의 세로 크기(두께)
     private ImageView ground; //가운데 땅
     private float groundY; //가운데 땅의 중간 Y좌표값
     private RectF playerRect;
@@ -63,8 +64,9 @@ public class Choice extends AppCompatActivity {
     private int gashiPoolStart = 0; //풀에서 소환된 오브젝트들의 처음 (풀 효율을 위한 것)
     private int gashiPoolEnd = 0; //풀에서 소환된 오브젝트들의 끝 (풀 효율을 위한 것)
     private List<Boolean> gR = new ArrayList<>(); //위쪽에 나올거면 False, 아래쪽에 나올거면 True
+    private List<Boolean> gRR = new ArrayList<>(); //트루면 반대방향으로.
     private List<Integer> gY = new ArrayList<>(); //가시와 발판의 Y좌표
-    private List<Float> gT = new ArrayList<>(); //다음 가시or발판이 나오기까지 대기시간(거리)
+    private List<Integer> gD = new ArrayList<>(); //이전 가시와의 거리
 
 
     private int platNum = 0;
@@ -74,7 +76,8 @@ public class Choice extends AppCompatActivity {
     private int platPoolEnd = 0; //가시 엔드랑 동일
     private List<Boolean> pR = new ArrayList<>();
     private List<Integer> pY = new ArrayList<>();
-    private List<Float> pT = new ArrayList<>();
+    private List<Integer> pl = new ArrayList<>(); //플랫폼의 길이
+    private List<Integer> pD = new ArrayList<>();
 
     int patternNum; //몇번째 패턴을 할건지
     private float objectSpeed = 30; //가시와 발판 스피드
@@ -154,10 +157,11 @@ public class Choice extends AppCompatActivity {
             //patternRunI = 0;
             gY.clear();
             gR.clear();
-            gT.clear();
+            gD.clear();
+            gRR.clear();
             pY.clear();
             pR.clear();
-            pT.clear();
+            pD.clear();
             pattern();
         }
     };
@@ -458,19 +462,21 @@ public class Choice extends AppCompatActivity {
     }
 
     //다른 방식의 장애물 생성 테스트
-    private void SpawnGashi(){
-        float X = screenWidth + 100;
+    private void SpawnObj(){
+        float X = screenWidth + 500;
         for(int i = 0; i < gY.size(); i++){
             ImageView gashi = gashiPool.get(gashiNum);
             gashi.setVisibility(View.VISIBLE);
+            X += gD.get(i);
             gashi.setX(X);
-            X += gT.get(i);
             if(gR.get(i)){
-                gashi.setRotationX(180);
+                if(!gRR.get(i)) gashi.setRotationX(180);
+                else gashi.setRotationX(0);
 
                 gashi.setY(groundY + ground.getHeight()/2 + gY.get(i));
             } else{
-                gashi.setRotationX(0);
+                if(!gRR.get(i)) gashi.setRotationX(0);
+                else gashi.setRotationX(180);
 
                 gashi.setY(groundY - ground.getHeight()/2 - gashiPool.get(gashiNum).getHeight() - gY.get(i));
             }
@@ -483,12 +489,16 @@ public class Choice extends AppCompatActivity {
             if(gashiNum >= gashiPoolSize) gashiNum = 0;
         }
 
-        X = screenWidth + 100;
+        X = screenWidth + 500;
         for(int i = 0; i < pY.size(); i++){
             ImageView platform = platPool.get(platNum);
             platform.setVisibility(View.VISIBLE);
+            X += pD.get(i);
             platform.setX(X);
-            X += pT.get(i);
+            ViewGroup.LayoutParams params = platform.getLayoutParams();
+            params.width = pl.get(i);
+            platform.setLayoutParams(params);
+            //platform.setLayoutParams(new ViewGroup.LayoutParams(30,30));
             if(pR.get(i)){
                 platform.setY(groundY + ground.getHeight() + pY.get(i));
             } else{
@@ -535,72 +545,63 @@ public class Choice extends AppCompatActivity {
         return random.nextInt(max - min + 1) + min; //(0, 패턴의 수 - 1)로 호출
     }
 
-    //r = 아래쪽? || y = 바닥으로부터 얼마나 떨어져있는지 || t = 다음 나올 가시 거리
-    private void patternSet(boolean r, int y, float t){
-        gR.add(r);
-        gY.add(y);
-        gT.add(t);
+    //gs = gashiSet. 가시 세팅
+    //r = 아래쪽? || y = 바닥으로부터 얼마나 떨어져있는지 || t = 이전 가시와의 거리
+    private void gs(boolean r, int y, int d){ //공중가시 소환(정방향)
+        gR.add(r); gY.add(y); gD.add(d); gRR.add(false);
     }
-    private void platformSet(boolean r, int y, float t){
+    private void gs(boolean r){ //땅 위에 바로 소환(이전 가시에 붙어 나오게)
+        gR.add(r); gY.add(0); gD.add(gashiSize); gRR.add(false);
+    }
+    private void gs(boolean r, int d){ //땅 위에 바로 소환(t는 이전 가시와의 거리 설정)
+        gR.add(r); gY.add(0); gD.add(d); gRR.add(false);
+    }
+    private void gs(boolean r, int y, int d, boolean rr){ //공중 뒤집힌 가시 생성
+        gR.add(r); gY.add(y); gD.add(d); gRR.add(rr);
+    }
+
+    //ps = platformSet. 플랫폼 세팅
+    private void ps(boolean r, int y, int l, int d){
         pR.add(r);
         pY.add(y);
-        pT.add(t);
+        pl.add(l);
+        pD.add(d);
+    }
+
+    private void platSet(boolean r, int y, int d){
+
     }
 
 
     private void pattern(){
-        patternNum = patternDrawing(0,1);
+        //patternNum = patternDrawing(0,1);
 
-        //patternNum = 0;
+        patternNum = 0;
 
         switch (patternNum){
             case 0:
-                patternSet(true,0,100);
-                patternSet(false,0,100);
-                patternSet(true,0,200);
-                patternSet(false,0,100);
-                patternSet(true,0,100);
-                patternSet(false,0,100);
-                patternSet(true,0,0);
-                patternSet(false,0,100);
-                patternSet(true,0,0);
-                patternSet(false,0,100);
+                gs(true);
+                gs(false);
+                gs(true, 200);
+                gs(false, 0);
 
-                platformSet(true, 120, 200);
-                platformSet(true, 120, 200);
-                platformSet(true, 120, 200);
-                platformSet(true, 120, 200);
-                platformSet(true, 120, 200);
+                ps(false, 120, gashiSize, 100);
                 break;
             case 1:
-                patternSet(false,0,0);
-                patternSet(true,0,100);
-                patternSet(false,0,0);
-                patternSet(true,0,100);
-                patternSet(false,0,0);
-                patternSet(true,0,100);
 
-                platformSet(false, 120, 300);
-                platformSet(false, 120, 300);
-                platformSet(false, 120, 300);
                 break;
             case 2:
-                patternSet(false,10,0);
-                patternSet(true,10,500);
-                patternSet(false,110,0);
-                patternSet(true,10,500);
-                patternSet(false,110,0);
-                patternSet(true,20,500);
+
                 break;
             case 3:
                 break;
         }
 
         //patternHandler.post(patternRun);
-        SpawnGashi();
+        SpawnObj();
 
 
     }
-}//이제 해야할게.... 가시 위아래 변형시키는거랑... 좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.
-//발판 길이도 수정할 수 있는 코드를 짜면 좋긋다//
+}//좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.
+
 
