@@ -36,6 +36,8 @@ public class Choice extends AppCompatActivity {
     ////////////////
 
     public ImageView player;
+    public int playerSize = 70; //플레이어 크기
+    public int gashiSize = 100; //가시 크기
     private ImageView ground; //가운데 땅
     private float groundY; //가운데 땅의 중간 Y좌표값
     private RectF playerRect;
@@ -169,8 +171,19 @@ public class Choice extends AppCompatActivity {
 
 
 
-        player = findViewById(R.id.player);
-        ground = findViewById(R.id.ground);
+        //player = findViewById(R.id.player);
+        player = new ImageView(this);
+        player.setImageResource(R.drawable.player);
+        ((ViewGroup)findViewById(android.R.id.content)).addView(player);
+        player.getLayoutParams().width = playerSize;
+        player.getLayoutParams().height = playerSize;
+        player.setScaleType(ImageView.ScaleType.FIT_XY);
+
+        ground = new ImageView(this);
+        ground.setImageResource(R.drawable.player);
+        ((ViewGroup)findViewById(android.R.id.content)).addView(ground);
+        ground.getLayoutParams().height = (int)(playerSize * 0.5f);
+        ground.setScaleType(ImageView.ScaleType.FIT_XY);
 
         groundRect = new RectF(ground.getLeft(), ground.getTop(), ground.getRight(), ground.getBottom());
 
@@ -194,7 +207,14 @@ public class Choice extends AppCompatActivity {
         ground.post(new Runnable() { //ground가 그려진 후 위치 설정.
             @Override
             public void run() {
+                int screenHeight = getResources().getDisplayMetrics().heightPixels;
+                ground.setY(screenHeight / 2 - ground.getHeight());
+                int screenWidth = getResources().getDisplayMetrics().widthPixels;
+                ground.getLayoutParams().width = screenWidth;
                 groundY = ground.getY() + ground.getHeight() / 2f; //땅 Y값의 중간값
+                player.setX(200); //플레이어 시작위치
+                player.setY(groundY - ground.getHeight()/2f - player.getHeight());
+
             }
         });
     }
@@ -250,6 +270,7 @@ public class Choice extends AppCompatActivity {
                 platRect.get(i).set(new RectF(plat.getX(), plat.getY(), plat.getX() + plat.getWidth(), plat.getY() + plat.getHeight()));
             }
         }
+
     }
 
     private void GroundCollisionCheck(){ //땅이랑 닿았는지 체크
@@ -279,6 +300,8 @@ public class Choice extends AppCompatActivity {
                             rectSetting();
                             //if(!RectF.intersects(playerRect,platRect.get(i))) continue;
                         }
+                        isJumping = true;
+                        translateY = 0;
                     } else {
                         while (RectF.intersects(playerRect, platRect.get(i))) {
                             if (!isreversal) {
@@ -289,31 +312,11 @@ public class Choice extends AppCompatActivity {
 
                             rectSetting();
 
-                        /*if(ii > 100){
-                            while(RectF.intersects(playerRect, platRect.get(i))){
-                                if(!isreversal){
-                                    player.offsetTopAndBottom(1);
-                                } else{
-                                    player.offsetTopAndBottom(-1);
-                                }
-                                rectSetting();
-                            }
-                            continue;
-                        }*/
 
                         }
+                        isJumping = false;
+                        translateY = 0;
                     }
-                    isJumping = false;
-                    translateY = 0;
-                    /*if(ii > 50){  //만약 너무 많이 움직였으면 (아래에서 머리를 박았으면)
-                        if(!isreversal){
-                            player.offsetTopAndBottom(ii);
-                            isJumping = true;
-                        } else{
-                            player.offsetTopAndBottom(-ii);
-                            isJumping = true;
-                        }
-                    }*/
                 }
             }
         }
@@ -386,7 +389,7 @@ public class Choice extends AppCompatActivity {
         gashi.setImageResource(R.drawable.gashi);
 
         //gashi.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
-        gashi.setLayoutParams(new ViewGroup.LayoutParams(150, 150));
+        gashi.setLayoutParams(new ViewGroup.LayoutParams(gashiSize, gashiSize));
 
         gashiPool.add(gashi);
         gashi.setVisibility(View.INVISIBLE);
@@ -495,6 +498,7 @@ public class Choice extends AppCompatActivity {
         return random.nextInt(max - min + 1) + min; //(0, 패턴의 수 - 1)로 호출
     }
 
+    //r = 아래쪽? || y = 바닥으로부터 얼마나 떨어져있는지 || t = 다음 나올 가시 거리
     private void patternSet(boolean r, int y, float t){
         gR.add(r);
         gY.add(y);
@@ -508,40 +512,40 @@ public class Choice extends AppCompatActivity {
 
 
     private void pattern(){
-        //patternNum = patternDrawing(0,1);
+        patternNum = patternDrawing(0,1);
 
-        patternNum = 0;
+        //patternNum = 0;
 
         switch (patternNum){
             case 0:
-                patternSet(true,0,200);
-                patternSet(false,0,200);
                 patternSet(true,0,100);
-                patternSet(false,0,300);
+                patternSet(false,0,100);
                 patternSet(true,0,200);
-                patternSet(false,0,200);
+                patternSet(false,0,100);
+                patternSet(true,0,100);
+                patternSet(false,0,100);
                 patternSet(true,0,0);
-                patternSet(false,0,200);
+                patternSet(false,0,100);
                 patternSet(true,0,0);
-                patternSet(false,0,200);
+                patternSet(false,0,100);
 
-                platformSet(true, 150, 200);
-                platformSet(true, 150, 200);
-                platformSet(true, 150, 200);
-                platformSet(true, 150, 200);
-                platformSet(true, 150, 200);
+                platformSet(true, 120, 200);
+                platformSet(true, 120, 200);
+                platformSet(true, 120, 200);
+                platformSet(true, 120, 200);
+                platformSet(true, 120, 200);
                 break;
             case 1:
                 patternSet(false,0,0);
-                patternSet(true,0,500);
+                patternSet(true,0,100);
                 patternSet(false,0,0);
-                patternSet(true,0,500);
+                patternSet(true,0,100);
                 patternSet(false,0,0);
-                patternSet(true,0,500);
+                patternSet(true,0,100);
 
-                platformSet(false, 150, 300);
-                platformSet(false, 150, 300);
-                platformSet(false, 150, 300);
+                platformSet(false, 120, 300);
+                platformSet(false, 120, 300);
+                platformSet(false, 120, 300);
                 break;
             case 2:
                 patternSet(false,10,0);
