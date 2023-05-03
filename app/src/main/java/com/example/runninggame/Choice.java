@@ -41,6 +41,7 @@ public class Choice extends AppCompatActivity {
     public int playerSize = 70; //플레이어 크기
     public int gashiSize = 100; //가시 크기
     private int platSize = 30; //플랫폼의 세로 크기(두께)
+    private int platY = 120; //땅의 1단 기본 높이
     private ImageView ground; //가운데 땅
     private float groundY; //가운데 땅의 중간 Y좌표값
     private RectF playerRect;
@@ -431,7 +432,7 @@ public class Choice extends AppCompatActivity {
         plat.setImageResource(R.drawable.platform);
         plat.setScaleType(ImageView.ScaleType.FIT_XY);
 
-        plat.setLayoutParams(new ViewGroup.LayoutParams(200, 30));
+        plat.setLayoutParams(new ViewGroup.LayoutParams(200, platSize));
 
         platPool.add(plat);
         platRect.add(new RectF());
@@ -500,9 +501,9 @@ public class Choice extends AppCompatActivity {
             platform.setLayoutParams(params);
             //platform.setLayoutParams(new ViewGroup.LayoutParams(30,30));
             if(pR.get(i)){
-                platform.setY(groundY + ground.getHeight() + pY.get(i));
+                platform.setY(groundY + ground.getHeight()/2 + pY.get(i));
             } else{
-                platform.setY(groundY - ground.getHeight() - platPool.get(platNum).getHeight() - pY.get(i));
+                platform.setY(groundY - ground.getHeight()/2 - platPool.get(platNum).getHeight() - pY.get(i));
             }
 
             platPoolEnd++;
@@ -547,8 +548,10 @@ public class Choice extends AppCompatActivity {
 
     //gs = gashiSet. 가시 세팅
     //r = 아래쪽? || y = 바닥으로부터 얼마나 떨어져있는지 || t = 이전 가시와의 거리
-    private void gs(boolean r, int y, int d){ //공중가시 소환(정방향)
-        gR.add(r); gY.add(y); gD.add(d); gRR.add(false);
+    private void gs(boolean r, int d, int y){ //공중가시 소환(1 정방향, 2 역방향)
+        gR.add(r); gD.add(d);
+        if(y == 0) { gY.add(platY+platSize); gRR.add(false); }
+        else if(y == 1) {gY.add(platY-gashiSize); gRR.add(true);}
     }
     private void gs(boolean r){ //땅 위에 바로 소환(이전 가시에 붙어 나오게)
         gR.add(r); gY.add(0); gD.add(gashiSize); gRR.add(false);
@@ -556,20 +559,17 @@ public class Choice extends AppCompatActivity {
     private void gs(boolean r, int d){ //땅 위에 바로 소환(t는 이전 가시와의 거리 설정)
         gR.add(r); gY.add(0); gD.add(d); gRR.add(false);
     }
-    private void gs(boolean r, int y, int d, boolean rr){ //공중 뒤집힌 가시 생성
+    private void gs(boolean r, int d, int y, boolean rr){ //공중 뒤집힌 가시 생성
         gR.add(r); gY.add(y); gD.add(d); gRR.add(rr);
     }
 
     //ps = platformSet. 플랫폼 세팅
-    private void ps(boolean r, int y, int l, int d){
-        pR.add(r);
-        pY.add(y);
-        pl.add(l);
-        pD.add(d);
+    private void ps(boolean r, int d, int l, int y){
+        pR.add(r); pY.add(y); pl.add(l); pD.add(d);
     }
 
-    private void platSet(boolean r, int y, int d){
-
+    private void ps(boolean r, int d, int l){
+        pR.add(r); pY.add(platY); pl.add(l); pD.add(d);
     }
 
 
@@ -577,15 +577,20 @@ public class Choice extends AppCompatActivity {
         //patternNum = patternDrawing(0,1);
 
         patternNum = 0;
-
+        //gs() 위/아래 , 거리 , 공중
         switch (patternNum){
             case 0:
                 gs(true);
                 gs(false);
                 gs(true, 200);
                 gs(false, 0);
+                gs(false, 300, 0);
+                gs(true, 200, 1);
 
-                ps(false, 120, gashiSize, 100);
+
+                ps(false, 100, gashiSize);
+                ps(false, gashiSize*2+400, gashiSize);
+                ps(true, 200, gashiSize);
                 break;
             case 1:
 
