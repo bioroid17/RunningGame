@@ -591,6 +591,7 @@ public class Choice extends AppCompatActivity {
                 ps(false, 100, gashiSize);
                 ps(false, gashiSize*2+400, gashiSize);
                 ps(true, 200, gashiSize);
+                ps(false, 0, 300);
                 break;
             case 1:
 
