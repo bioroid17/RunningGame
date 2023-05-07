@@ -48,8 +48,8 @@ public class Choice extends AppCompatActivity {
     private RectF playerHeadRect;
     private RectF groundRect;
     private List<RectF> platRect = new ArrayList<>();
-    private float jumpHeight = 60f; //점프 첫속도 (점프하는 힘.)
-    private float gravity = 6f; //중력크기
+    private float jumpHeight = 50f; //점프 첫속도 (점프하는 힘.)
+    private float gravity = 3.5f; //중력크기
     private boolean isJumping = false; //false일때 점프 가능
     private float translateY = 0; //플레이어 Y값 변경
     private boolean isreversal = false; //true면 반전상태
@@ -61,7 +61,7 @@ public class Choice extends AppCompatActivity {
     private int gashiNum = 0; //풀 안의 몇번째 가시를 꺼내쓸건지
     //private int removeGashiNum = 0;
     private List<ImageView> gashiPool = new ArrayList<>(); //가시 풀
-    private int gashiPoolSize = 0; //풀을 효율적으로 관리하기 위한 변수
+    private int gashiPoolSize = 1000; //풀을 효율적으로 관리하기 위한 변수
     private int gashiPoolStart = 0; //풀에서 소환된 오브젝트들의 처음 (풀 효율을 위한 것)
     private int gashiPoolEnd = 0; //풀에서 소환된 오브젝트들의 끝 (풀 효율을 위한 것)
     private List<Boolean> gR = new ArrayList<>(); //위쪽에 나올거면 False, 아래쪽에 나올거면 True
@@ -72,7 +72,7 @@ public class Choice extends AppCompatActivity {
 
     private int platNum = 0;
     private List<ImageView> platPool = new ArrayList<>();
-    private int platPoolSize = 0; //풀을 효율적으로 관리하기 위한 변수
+    private int platPoolSize = 1000; //풀을 효율적으로 관리하기 위한 변수
     private int platPoolStart = 0; //가시 스타트랑 동일
     private int platPoolEnd = 0; //가시 엔드랑 동일
     private List<Boolean> pR = new ArrayList<>();
@@ -81,7 +81,7 @@ public class Choice extends AppCompatActivity {
     private List<Integer> pD = new ArrayList<>();
 
     int patternNum; //몇번째 패턴을 할건지
-    private float objectSpeed = 30; //가시와 발판 스피드
+    private float objectSpeed = 20; //가시와 발판 스피드
 
     //////////////////////////////////////////
 
@@ -202,14 +202,12 @@ public class Choice extends AppCompatActivity {
 
         groundRect = new RectF(ground.getLeft(), ground.getTop(), ground.getRight(), ground.getBottom());
 
-        for(int i = 0; i < 100; i++) {
+        for(int i = 0; i < gashiPoolSize; i++) {
             createGashi();
-            gashiPoolSize++;
         }
 
-        for(int i = 0; i < 20; i++){
+        for(int i = 0; i < platPoolSize; i++){
             createPlatform();
-            platPoolSize++;
         }
 
         gamehandler.post(gameRunnable);
@@ -275,9 +273,9 @@ public class Choice extends AppCompatActivity {
     private void rectSetting(){ //각자 렉트를 재설정
         playerRect = new RectF(player.getX(), player.getY(), player.getX() + player.getWidth(),player.getY() + player.getHeight());
         if(!isreversal) //플레이어의 머리 렉트
-            playerHeadRect = new RectF(player.getX(), player.getY(), player.getX() + player.getWidth(), player.getY() + 5);
+            playerHeadRect = new RectF(player.getX(), player.getY(), player.getX() + player.getWidth(), player.getY() + 15);
         else
-            playerHeadRect = new RectF(player.getX(), player.getY()+player.getHeight()-5, player.getX()+player.getWidth(), player.getY()+player.getHeight());
+            playerHeadRect = new RectF(player.getX(), player.getY()+player.getHeight()-15, player.getX()+player.getWidth(), player.getY()+player.getHeight());
 
         if(platPoolStart < platPoolEnd){
             for(int i = platPoolStart; i < platPoolEnd; i++){
@@ -393,7 +391,8 @@ public class Choice extends AppCompatActivity {
                 return true;
             }
             if (keyCode == KeyEvent.KEYCODE_W) {
-                spawnGashi(0, false); //false = 똑바로 소환
+                player.setY(groundY - ground.getHeight()/2f - player.getHeight());
+
                 return true;
             }
             if (keyCode == KeyEvent.KEYCODE_E) {
@@ -576,7 +575,7 @@ public class Choice extends AppCompatActivity {
     private void pattern(){
         //patternNum = patternDrawing(0,1);
 
-        patternNum = 0;
+        patternNum = 2;
         //gs() 위/아래 , 거리 , 공중
         switch (patternNum){
             case 0:
@@ -593,9 +592,46 @@ public class Choice extends AppCompatActivity {
                 ps(true, 200, gashiSize);
                 break;
             case 1:
+                gs(false, 0); gs(true, 0); gs(true, 0, 0);
+                gs(false); gs(true, 0); gs(true, 0, 0);
+                gs(false); gs(true, 0); gs(true, 0, 0);
+
+                for(int j = 0; j < 10; j++) {
+                    for (int i = 0; i < 5; i++) {
+                        gs(false);
+                        gs(true, 0);
+                    }
+                    for (int i = 0; i < 3; i++) {
+                        gs(false);
+                        gs(true, 0);
+                        gs(false, 0, 0);
+                    }
+                    for (int i = 0; i < 5; i++) {
+                        gs(false);
+                        gs(true, 0);
+                    }
+                    for (int i = 0; i < 3; i++) {
+                        gs(false);
+                        gs(true, 0);
+                        gs(true, 0, 0);
+                    }
+                }
+                ps(false, 0, gashiSize*3);
+                ps(true, 0, gashiSize*3);
+                for(int i = 0; i < 20; i++){
+                    ps(true, 800, gashiSize*3);
+                    ps(false, 0, gashiSize*3);
+                }
+
+                ps(true, 10000, 100);
 
                 break;
             case 2:
+                ps(true, 0, 1000);
+                ps(false, 0, 1000);
+
+                ps(true, 1300, 1000);
+                ps(false, 0, 1000);
 
                 break;
             case 3:
