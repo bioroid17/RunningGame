@@ -16,6 +16,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,8 +31,11 @@ public class Choice extends AppCompatActivity {
     private int score = 0;
     private Timer timer;
     private TextView scoreTextView;
+    private TextView restartTextView;
+    private ImageButton restartButton;
 
     private boolean isPaused = false;
+    private boolean isDead = false;
 
 
     ////////////////
@@ -47,6 +52,7 @@ public class Choice extends AppCompatActivity {
     private RectF playerRect;
     private RectF playerHeadRect;
     private RectF groundRect;
+    private List<RectF> gashiRect = new ArrayList<>();
     private List<List<RectF>> platRect = new ArrayList<>();
     private float jumpHeight = 50f; //점프 첫속도 (점프하는 힘.)
     private float gravity = 3.5f; //중력크기
@@ -108,7 +114,7 @@ public class Choice extends AppCompatActivity {
     private Runnable moveObjects = new Runnable() {
         @Override
         public void run() {
-            if(!isPaused) {
+            if(!isPaused && !isDead) {
                 if(gashiPoolStart < gashiPoolEnd) {
                     for(int i = gashiPoolStart; i < gashiPoolEnd; i++){
                         gashiMove(i);
@@ -178,6 +184,7 @@ public class Choice extends AppCompatActivity {
         }
     };
     private int screenWidth;
+    private int screenHeight;
 
 
 
@@ -190,12 +197,18 @@ public class Choice extends AppCompatActivity {
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        // 화면 가로, 세로 크기
         screenWidth = displayMetrics.widthPixels;
+        screenHeight = displayMetrics.heightPixels;
 
         scoreTextView = findViewById(R.id.score_text_view);
         startTimer();
 
-
+        restartTextView = findViewById(R.id.restart_text);
+        restartTextView.setVisibility(View.INVISIBLE);
+        restartButton = findViewById(R.id.restart_button);
+        restartButton.setVisibility(View.INVISIBLE);
 
 
         for(int i = 0; i < 10; i++){
@@ -258,7 +271,7 @@ public class Choice extends AppCompatActivity {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!isPaused) {
+                if (!isPaused && !isDead) {
                     score++;
                     runOnUiThread(new Runnable() {
                         @Override
@@ -273,6 +286,18 @@ public class Choice extends AppCompatActivity {
 
     public void onPauseButtonClick(View view) {
         isPaused = !isPaused;
+    }
+    public void onRestartButtonClick(View view) {
+        isDead = false;
+        view.setVisibility(View.INVISIBLE);
+        restartTextView.setVisibility(View.INVISIBLE);
+        for(ImageView gashi : gashiPool){
+            removeGashi(gashi);
+        }
+//        for(ImageView platform : platPool){
+//            removePlatform(platform);
+//        }
+        score = 0;
     }
 
     @Override
@@ -310,10 +335,26 @@ public class Choice extends AppCompatActivity {
                     platRectSetting(j, i);
             }
         }
+
+        if(gashiPoolStart < gashiPoolEnd){
+            for(int i = gashiPoolStart; i < gashiPoolEnd; i++){
+                gashiRectSetting(i);
+            }
+        } else if(gashiPoolStart > gashiPoolEnd){
+            for(int i = gashiPoolStart; i < gashiPoolSize; i++)
+                gashiRectSetting(i);
+            for(int i = 0; i < gashiPoolEnd; i++)
+                gashiRectSetting(i);
+        }
     }
     private void platRectSetting(int j, int i){
         instance = platPool.get(j).get(i);
         platRect.get(j).get(i).set(new RectF(instance.getX(), instance.getY(), instance.getX() + instance.getWidth(), instance.getY() + instance.getHeight()));
+    }
+
+    private void gashiRectSetting(int i){
+        instance = gashiPool.get(i);
+        gashiRect.get(i).set(new RectF(instance.getX(), instance.getY(), instance.getX() + instance.getWidth(), instance.getY() + instance.getHeight()));
     }
 
     private void GroundCollisionCheck(){ //땅이랑 닿았는지 체크
@@ -342,6 +383,19 @@ public class Choice extends AppCompatActivity {
                 }
             }
         }
+
+        if(gashiPoolStart < gashiPoolEnd){
+            for(int i = gashiPoolStart; i < gashiPoolEnd; i++){
+                gashiCollisionCheck(i);
+            }
+        } else if(gashiPoolStart > gashiPoolEnd){
+            for(int i = gashiPoolStart; i < gashiPoolSize; i++){
+                gashiCollisionCheck(i);
+            }
+            for(int i = 0; i < gashiPoolEnd; i++){
+                gashiCollisionCheck(i);
+            }
+        }
     }
     private void platCollisionCheck(int j, int i){
         if(platPool.get(j).get(i).getVisibility() == View.VISIBLE) {
@@ -357,7 +411,6 @@ public class Choice extends AppCompatActivity {
                         rectSetting();
                     }
                     isJumping = true;
-                    translateY = 0;
                 } else {
                     while (RectF.intersects(playerRect, platRect.get(j).get(i))) {
                         if (!isreversal) {
@@ -365,13 +418,22 @@ public class Choice extends AppCompatActivity {
                         } else {
                             player.offsetTopAndBottom(1);
                         }
-
                         rectSetting();
-
-
                     }
                     isJumping = false;
-                    translateY = 0;
+                }
+                translateY = 0;
+            }
+        }
+    }
+
+    private void gashiCollisionCheck(int i){
+        if(gashiPool.get(i).getVisibility() == View.VISIBLE) {
+            if (RectF.intersects(playerRect, gashiRect.get(i))){
+                if(RectF.intersects(playerHeadRect, gashiRect.get(i))){
+                    isDead = true;
+                    restartButton.setVisibility(View.VISIBLE);
+                    restartTextView.setVisibility(View.VISIBLE);
                 }
             }
         }
@@ -414,23 +476,6 @@ public class Choice extends AppCompatActivity {
                 reversal();
                 return true;
             }
-            if (keyCode == KeyEvent.KEYCODE_W) {
-                player.setY(groundY - ground.getHeight()/2f - player.getHeight());
-
-                return true;
-            }
-            if (keyCode == KeyEvent.KEYCODE_E) {
-                spawnGashi(0, true); //true = 거꾸로 소환
-                return true;
-            }
-            if (keyCode == KeyEvent.KEYCODE_Q) {
-                spawnGashi(200, false);
-                return true;
-            }
-            if (keyCode == KeyEvent.KEYCODE_R) {
-                spawnGashi(200, true);
-                return true;
-            }
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -440,10 +485,12 @@ public class Choice extends AppCompatActivity {
     private void createGashi(){
         ImageView gashi = new ImageView(this);
         gashi.setImageResource(R.drawable.gashi);
+        gashi.setScaleType(ImageView.ScaleType.FIT_XY);
 
         gashi.setLayoutParams(new ViewGroup.LayoutParams(gashiSize, gashiSize));
 
         gashiPool.add(gashi);
+        gashiRect.add(new RectF());
         gashi.setVisibility(View.INVISIBLE);
         ((ViewGroup)findViewById(android.R.id.content)).addView(gashi); // 부모 뷰를 지정
 
@@ -465,27 +512,6 @@ public class Choice extends AppCompatActivity {
             ((ViewGroup) findViewById(android.R.id.content)).addView(plat);
         }
 
-    }
-    private ImageView spawnGashi(int y, boolean isreversal){
-        ImageView gashi = gashiPool.get(gashiNum);
-        gashi.setVisibility(View.VISIBLE);
-        gashi.setX(screenWidth + gashiPool.get(gashiNum).getWidth());
-
-        if(isreversal) { //아래쪽에서 가시 나옴
-            gashi.setRotationX(180);
-
-            gashi.setY(groundY + ground.getHeight() / 2f + y);
-        }
-        else {
-            gashi.setRotationX(0);
-
-            gashi.setY(groundY - gashiPool.get(gashiNum).getHeight() - ground.getHeight() / 2f - y);
-        }
-
-        gashiNum++;
-        if(gashiNum >= gashiPool.size()) gashiNum = 0;
-
-        return gashi;
     }
 
     //다른 방식의 장애물 생성 테스트
@@ -620,7 +646,7 @@ public class Choice extends AppCompatActivity {
     private void pattern(){
         //patternNum = patternDrawing(0,1);
 
-        patternNum = 1;
+        patternNum = 8;
         //gs() 위/아래 , 거리 , 공중
         switch (patternNum){
             case 0:
@@ -680,13 +706,116 @@ public class Choice extends AppCompatActivity {
 
                 break;
             case 3:
-                ps(false, 100, 500);
-                ps(true, 200, 300);
-                ps(false, 750, 900);
-                for(int i = 0; i < 10; i++) {
+                // 위로 18개의 가시가 연속으로 등장
+                for(int i=0; i<18; i++)
                     gs(false);
+
+                break;
+            case 4:
+                // 위로 4개의 가시가 연속으로 등장
+                for(int i=0; i<4; i++)
+                    gs(false);
+                // 아래로 4개의 가시가 연속으로 등장
+                for(int i=0; i<4; i++)
                     gs(true);
+                // 위로 4개의 가시가 연속으로 등장
+                for(int i=0; i<4; i++)
+                    gs(false);
+                // 아래로 4개의 가시가 연속으로 등장
+                for(int i=0; i<4; i++)
+                    gs(true);
+                break;
+            case 5:
+                for(int i=0; i<12; i++){
+                    gs(false);
+                    gs(true, 0);
+                    if(i%3 != 2){
+                        if((i/3) % 2 == 1){
+                            gs(false, 0, gashiSize * 3 / 2, false);
+                        }
+                        else{
+                            gs(true, 0, gashiSize * 3 / 2, false);
+                        }
+                    }
                 }
+
+                ps(false, gashiSize, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                break;
+            case 6:
+                for(int i=0; i<12; i++){
+                    gs(false);
+                    gs(true, 0);
+                    if(i%3 != 2){
+                        if((i/3) % 2 == 0){
+                            gs(false, 0, gashiSize * 3 / 2, false);
+                        }
+                        else{
+                            gs(true, 0, gashiSize * 3 / 2, false);
+                        }
+                    }
+                }
+
+                ps(false, gashiSize, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                break;
+            case 7:
+                for(int i=0; i<12; i++){
+                    gs(false);
+                    gs(true, 0);
+                    if(i%3 != 2){
+                        if((i/3) % 3 == 0){
+                            gs(false, 0, gashiSize * 3 / 2, false);
+                        }
+                        else{
+                            gs(true, 0, gashiSize * 3 / 2, false);
+                        }
+                    }
+                }
+
+                ps(false, gashiSize, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                break;
+            case 8:
+                for(int i=0; i<12; i++){
+                    gs(false);
+                    gs(true, 0);
+                    if(i%3 != 2){
+                        if((i/3) % 3 == 0){
+                            gs(true, 0, gashiSize * 3 / 2, false);
+                        }
+                        else{
+                            gs(false, 0, gashiSize * 3 / 2, false);
+                        }
+                    }
+                }
+
+                ps(false, gashiSize, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
                 break;
         }
 

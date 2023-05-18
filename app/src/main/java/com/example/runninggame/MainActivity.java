@@ -57,14 +57,14 @@ public class MainActivity extends AppCompatActivity {
 
         ImageView imageView = findViewById(R.id.sound_set);
 
-// 이미지가 처음에 보이지 않도록 visibility 속성을 INVISIBLE로 설정합니다.
+        // 이미지가 처음에 보이지 않도록 visibility 속성을 INVISIBLE로 설정합니다.
         imageView.setVisibility(View.INVISIBLE);
 
-// ImageView가 이동할 위치를 계산합니다.
+        // ImageView가 이동할 위치를 계산합니다.
         float x = (float)(getWindowManager().getDefaultDisplay().getWidth() - imageView.getWidth());
         float y = imageView.getY();
 
-// 1초 후에 애니메이션을 실행합니다.
+        // 1초 후에 애니메이션을 실행합니다.
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
