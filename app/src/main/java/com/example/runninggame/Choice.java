@@ -30,7 +30,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 public class Choice extends AppCompatActivity {
-    static int maplevel=0;
+    static int maplevel=0; //0스테이지부터 ~~
     static int patNum=0;
     private int score = 0;
     private Timer timer;
@@ -690,6 +690,7 @@ public class Choice extends AppCompatActivity {
 //        gs() 위/아래 , 거리 , 공중
         switch (select){
             case 0:
+
                 gs(true);
                 gs(false);
                 gs(true, 200);
@@ -703,6 +704,7 @@ public class Choice extends AppCompatActivity {
                 ps(true, 200, gashiSize);
                 break;
             case 1:
+
                 gs(false, 0); gs(true, 0); gs(true, 0, 0);
                 gs(false); gs(true, 0); gs(true, 0, 0);
                 gs(false); gs(true, 0); gs(true, 0, 0);
@@ -735,22 +737,22 @@ public class Choice extends AppCompatActivity {
                 }
 
                 //ps(true, 10000, 100);
-
                 break;
+
             case 2:
                 ps(true, 0, 1000);
                 ps(false, 0, 1000);
 
                 ps(true, 1300, 1000);
                 ps(false, 0, 1000);
-
                 break;
+
             case 3:
                 // 위로 18개의 가시가 연속으로 등장
                 for(int i=0; i<18; i++)
                     gs(false);
-
                 break;
+
             case 4:
                 // 위로 4개의 가시가 연속으로 등장
                 for(int i=0; i<4; i++)
@@ -765,6 +767,7 @@ public class Choice extends AppCompatActivity {
                 for(int i=0; i<4; i++)
                     gs(true);
                 break;
+
             case 5:
                 for(int i=0; i<12; i++){
                     gs(false);
@@ -788,6 +791,7 @@ public class Choice extends AppCompatActivity {
                 ps(false, gashiSize * 3, gashiSize*2);
                 ps(true, 0, gashiSize*2);
                 break;
+
             case 6:
                 for(int i=0; i<12; i++){
                     gs(false);
@@ -811,6 +815,7 @@ public class Choice extends AppCompatActivity {
                 ps(false, gashiSize * 3, gashiSize*2);
                 ps(true, 0, gashiSize*2);
                 break;
+
             case 7:
                 for(int i=0; i<12; i++){
                     gs(false);
@@ -834,6 +839,7 @@ public class Choice extends AppCompatActivity {
                 ps(false, gashiSize * 3, gashiSize*2);
                 ps(true, 0, gashiSize*2);
                 break;
+
             case 8:
                 for(int i=0; i<12; i++){
                     gs(false);
@@ -859,8 +865,5 @@ public class Choice extends AppCompatActivity {
                 break;
         }
     }
-
-
-
 }//좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.
 

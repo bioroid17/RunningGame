@@ -10,13 +10,16 @@ public class maptemp {
         for (int i = 0; i < 5; i++) {
             stagelevel[i] = new ArrayList<Integer>();
         }
+
         stagelevel[0].add(1);
         stagelevel[0].add(2);
         stagelevel[0].add(3);
         stagelevel[0].add(4);
+
         stagelevel[1].add(3);
         stagelevel[1].add(2);
         stagelevel[1].add(1);
+
         stagelevel[2].add(2);
         stagelevel[2].add(3);
         stagelevel[3].add(4);
