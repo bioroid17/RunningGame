@@ -1,5 +1,7 @@
 package com.example.runninggame;
 
+import static com.example.runninggame.maptemp.*;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.pm.ActivityInfo;
@@ -28,6 +30,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 public class Choice extends AppCompatActivity {
+    static int maplevel=0;
+    static int patNum=0;
     private int score = 0;
     private Timer timer;
     private TextView scoreTextView;
@@ -74,7 +78,6 @@ public class Choice extends AppCompatActivity {
     private List<Boolean> gRR = new ArrayList<>(); //트루면 반대방향으로.
     private List<Integer> gY = new ArrayList<>(); //가시와 발판의 Y좌표
     private List<Integer> gD = new ArrayList<>(); //이전 가시와의 거리
-
 
     private List<Boolean> pMR = new ArrayList<>();
     private List<Integer> pMY = new ArrayList<>();
@@ -194,7 +197,6 @@ public class Choice extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_choice);
-
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
@@ -642,13 +644,31 @@ public class Choice extends AppCompatActivity {
         pMR.add(r); pMY.add(platY); pML.add(l); pMD.add(d);
     }
 
-
     private void pattern(){
         //patternNum = patternDrawing(0,1);
+        MapList(maplevel,patNum);
+        patNum++;
+        //patternHandler.post(patternRun);
+        SpawnObj();
+    }
 
-        patternNum = 8;
-        //gs() 위/아래 , 거리 , 공중
-        switch (patternNum){
+    public void MapList(int level,int patternNum) {
+        if(stagelevel[level].size()==patternNum){
+            maplevel++;
+            if(maplevel==stagelevel.length){ //지금은 0~4단계 까지 maptemp가서 확인
+                maplevel=0;
+            }
+            patNum=0;
+        }
+        SelectPattern(stagelevel[level].get(patternNum)); //0번쨰 stage의 patterNum째의 패턴을 가져온다
+    }
+
+
+
+
+    public void SelectPattern(int select){ //여기에 패턴 만들고 패턴번호 붙이면 됨 사용은 maptemp에서 stagelevel list에 add(패턴숫자)하면 됨
+//        gs() 위/아래 , 거리 , 공중
+        switch (select){
             case 0:
                 gs(true);
                 gs(false);
@@ -818,12 +838,9 @@ public class Choice extends AppCompatActivity {
                 ps(true, 0, gashiSize*2);
                 break;
         }
-
-        //patternHandler.post(patternRun);
-        SpawnObj();
-
-
     }
-}//좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.
 
+
+
+}//좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.
 

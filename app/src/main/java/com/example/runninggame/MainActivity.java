@@ -25,8 +25,10 @@ public class MainActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private AnimationSet animationSet;
     private ImageView character;
-    private View nextButton;
     private int screenWidth;
+
+
+
 
 
     @Override
@@ -41,6 +43,36 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
+        maptemp.setmap();
+
+        ImageView leafimage = findViewById(R.id.leaf);
+        ImageView leafimage2 = findViewById(R.id.leaf2);
+        ImageView leafimage3 = findViewById(R.id.leaf3);
+        ImageView leafimage4 = findViewById(R.id.leaf4);
+        ImageView leafimage5 = findViewById(R.id.leaf5);
+        ImageView leafimage6 = findViewById(R.id.leaf6);
+        ImageView leafimage11 = findViewById(R.id.leaf7);
+        ImageView leafimage7 = findViewById(R.id.leaf10);
+        ImageView leafimage8 = findViewById(R.id.leaf11);
+        ImageView leafimage9 = findViewById(R.id.leaf12);
+        ImageView leafimage10 = findViewById(R.id.leaf13);
+
+        Animation leafanim = AnimationUtils.loadAnimation(this, R.anim.leaf_animation);
+        Animation leafanim2= AnimationUtils.loadAnimation(this, R.anim.leaf_animation2);
+        Animation leafanim3= AnimationUtils.loadAnimation(this, R.anim.leaf_animation3);
+        Animation leafanim4= AnimationUtils.loadAnimation(this, R.anim.leaf_animation4);
+        Animation leafanim5= AnimationUtils.loadAnimation(this, R.anim.leaf_animation5);
+        leafimage.startAnimation(leafanim);
+        leafimage7.startAnimation(leafanim);
+        leafimage2.startAnimation(leafanim2);
+        leafimage8.startAnimation(leafanim2);
+        leafimage3.startAnimation(leafanim3);
+        leafimage9.startAnimation(leafanim3);
+        leafimage4.startAnimation(leafanim4);
+        leafimage10.startAnimation(leafanim4);
+        leafimage5.startAnimation(leafanim);
+        leafimage6.startAnimation(leafanim5);
+        leafimage11.startAnimation(leafanim5);
 
         // TextView 객체를 참조합니다.
         TextView textView = findViewById(R.id.my_text_view);
@@ -85,8 +117,6 @@ public class MainActivity extends AppCompatActivity {
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         character = findViewById(R.id.character);
-        nextButton = findViewById(R.id.nextButton);
-        nextButton.setVisibility(View.INVISIBLE);
         bt_m_play = findViewById(R.id.bt_Play);
 
         // 캐릭터를 처음에 화면에 보이도록 설정합니다.
@@ -95,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
         bt_m_play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent NEXT = new Intent(MainActivity.this, Choice.class);
+                startActivity(NEXT);
                 jumpAndTranslate();
             }
         });
@@ -110,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                nextButton.setVisibility(View.VISIBLE);
             }
 
             @Override
