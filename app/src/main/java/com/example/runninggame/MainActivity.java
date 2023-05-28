@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         rootView = findViewById(android.R.id.content);
         random = new Random();
 
-        for (int i = 0; i < 20; i++) { // 20개의 눈을 생성
+        for (int i = 0; i < 30; i++) { // 20개의 눈을 생성
             ImageView snowflake = new ImageView(MainActivity.this);
             snowflake.setImageResource(R.drawable.snowflake_image);
             rootView.addView(snowflake);
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         int endX = -snowflake.getWidth(); // 왼쪽 끝으로 이동
         int endY = random.nextInt(screenHeight);
 
-        int duration = random.nextInt(3000) + 2000; // 2000ms부터 5000ms 사이의 랜덤한 시간 (2초부터 5초)
+        int duration = random.nextInt(4000) + 4000; // 4000ms부터 8000 사이의 랜덤한 시간 (2초부터 5초)
 
         ObjectAnimator animatorX = ObjectAnimator.ofFloat(snowflake, "translationX", startX, endX);
         ObjectAnimator animatorY = ObjectAnimator.ofFloat(snowflake, "translationY", startY, endY);
