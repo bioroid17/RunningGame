@@ -518,6 +518,7 @@ public class Choice extends AppCompatActivity {
 
     //다른 방식의 장애물 생성 테스트
     private void SpawnObj() {
+        System.out.println("스폰 실행");
         float X = screenWidth + 500;
         for (int i = 0; i < gY.size(); i++) {
             ImageView gashi = gashiPool.get(gashiNum);
@@ -575,7 +576,6 @@ public class Choice extends AppCompatActivity {
 
 
     private void removeGashi(ImageView gashi){
-
         gashi.setVisibility(View.INVISIBLE);
         gashiPoolStart++;
         if(gashiPoolStart >= gashiPoolSize)
@@ -588,9 +588,13 @@ public class Choice extends AppCompatActivity {
                     platDeleteNum++;
                 }
             }
-            if(platDeleteNum == 10) nextPatternHandler.post(nextPattern);
+            if(platDeleteNum == 10) {
+                System.out.println("nextPattern 실행");
+                nextPatternHandler.post(nextPattern);
+            }
         }
     }
+
     private void removePlatform(int i, ImageView platform){
         platform.setVisibility(View.INVISIBLE);
         platPoolStart[i]++;
@@ -646,21 +650,23 @@ public class Choice extends AppCompatActivity {
 
     private void pattern(){
         //patternNum = patternDrawing(0,1);
+        System.out.println(maplevel+"번째 맵의"+patNum+"번째 패턴 실행");
         MapList(maplevel,patNum);
-        patNum++;
         //patternHandler.post(patternRun);
         SpawnObj();
     }
 
     public void MapList(int level,int patternNum) {
-        if(stagelevel[level].size()==patternNum){
+        SelectPattern(stagelevel[level].get(patternNum)); //0번쨰 stage의 patterNum째의 패턴을 가져온다
+        patNum++;
+        if(stagelevel[level].size()==patternNum+1){
             maplevel++;
             if(maplevel==stagelevel.length){ //지금은 0~4단계 까지 maptemp가서 확인
                 maplevel=0;
             }
             patNum=0;
+            System.out.println("다음 맵");
         }
-        SelectPattern(stagelevel[level].get(patternNum)); //0번쨰 stage의 patterNum째의 패턴을 가져온다
     }
 
 
