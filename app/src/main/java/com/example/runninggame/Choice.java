@@ -36,7 +36,9 @@ public class Choice extends AppCompatActivity {
     private Timer timer;
     private TextView scoreTextView;
     private TextView restartTextView;
+    private  TextView mainmenuTextView;
     private ImageButton restartButton;
+    private ImageButton mainmenuButton;
 
     private boolean isPaused = false;
     private boolean isDead = false;
@@ -212,6 +214,11 @@ public class Choice extends AppCompatActivity {
         restartButton = findViewById(R.id.restart_button);
         restartButton.setVisibility(View.INVISIBLE);
 
+        mainmenuTextView = findViewById(R.id.mainmenu_text);
+        mainmenuTextView.setVisibility(View.INVISIBLE);
+        mainmenuButton = findViewById(R.id.mainmenu_button);
+        mainmenuButton.setVisibility(View.INVISIBLE);
+
 
         for(int i = 0; i < 10; i++){
             platNum[i] = 0;
@@ -293,13 +300,17 @@ public class Choice extends AppCompatActivity {
         isDead = false;
         view.setVisibility(View.INVISIBLE);
         restartTextView.setVisibility(View.INVISIBLE);
+        mainmenuButton.setVisibility(View.INVISIBLE);
+        mainmenuTextView.setVisibility(View.INVISIBLE);
         for(ImageView gashi : gashiPool){
             removeGashi(gashi);
         }
-//        for(ImageView platform : platPool){
+//        for(List<ImageView> platform : platPool){
 //            removePlatform(platform);
 //        }
         score = 0;
+    }
+    public void onMainMenuButtonClick(View view){
     }
 
     @Override
@@ -436,6 +447,9 @@ public class Choice extends AppCompatActivity {
                     isDead = true;
                     restartButton.setVisibility(View.VISIBLE);
                     restartTextView.setVisibility(View.VISIBLE);
+                    scoreTextView.setVisibility(View.VISIBLE);
+                    mainmenuButton.setVisibility(View.VISIBLE);
+                    mainmenuTextView.setVisibility(View.VISIBLE);
                 }
             }
         }
