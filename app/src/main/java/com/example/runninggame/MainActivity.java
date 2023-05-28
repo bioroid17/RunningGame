@@ -2,6 +2,10 @@ package com.example.runninggame;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Point;
@@ -11,16 +15,25 @@ import android.view.View;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Random;
+
 public class MainActivity extends AppCompatActivity {
 
+
+    private ViewGroup rootView;
+    private Random random;
+    private ImageView backgroundImage;
     private Button bt_m_play;
     private MediaPlayer mediaPlayer;
     private AnimationSet animationSet;
@@ -45,34 +58,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         maptemp.setmap();
 
-        ImageView leafimage = findViewById(R.id.leaf);
-        ImageView leafimage2 = findViewById(R.id.leaf2);
-        ImageView leafimage3 = findViewById(R.id.leaf3);
-        ImageView leafimage4 = findViewById(R.id.leaf4);
-        ImageView leafimage5 = findViewById(R.id.leaf5);
-        ImageView leafimage6 = findViewById(R.id.leaf6);
-        ImageView leafimage11 = findViewById(R.id.leaf7);
-        ImageView leafimage7 = findViewById(R.id.leaf10);
-        ImageView leafimage8 = findViewById(R.id.leaf11);
-        ImageView leafimage9 = findViewById(R.id.leaf12);
-        ImageView leafimage10 = findViewById(R.id.leaf13);
+        rootView = findViewById(android.R.id.content);
+        random = new Random();
 
-        Animation leafanim = AnimationUtils.loadAnimation(this, R.anim.leaf_animation);
-        Animation leafanim2= AnimationUtils.loadAnimation(this, R.anim.leaf_animation2);
-        Animation leafanim3= AnimationUtils.loadAnimation(this, R.anim.leaf_animation3);
-        Animation leafanim4= AnimationUtils.loadAnimation(this, R.anim.leaf_animation4);
-        Animation leafanim5= AnimationUtils.loadAnimation(this, R.anim.leaf_animation5);
-        leafimage.startAnimation(leafanim);
-        leafimage7.startAnimation(leafanim);
-        leafimage2.startAnimation(leafanim2);
-        leafimage8.startAnimation(leafanim2);
-        leafimage3.startAnimation(leafanim3);
-        leafimage9.startAnimation(leafanim3);
-        leafimage4.startAnimation(leafanim4);
-        leafimage10.startAnimation(leafanim4);
-        leafimage5.startAnimation(leafanim);
-        leafimage6.startAnimation(leafanim5);
-        leafimage11.startAnimation(leafanim5);
+        for (int i = 0; i < 20; i++) { // 20개의 눈을 생성
+            ImageView snowflake = new ImageView(MainActivity.this);
+            snowflake.setImageResource(R.drawable.snowflake_image);
+            rootView.addView(snowflake);
+
+            animateSnowflake(snowflake);
+        }
+
 
         // TextView 객체를 참조합니다.
         TextView textView = findViewById(R.id.my_text_view);
@@ -150,6 +146,44 @@ public class MainActivity extends AppCompatActivity {
 
         mediaPlayer = MediaPlayer.create(this, R.raw.sillychipsong);
         mediaPlayer.setLooping(true);
+    }
+
+    private void animateSnowflake(final ImageView snowflake) {
+        // 눈의 크기 조정
+        int desiredWidth = 10;
+        int desiredHeight = 10;
+
+        ViewGroup.LayoutParams layoutParams = snowflake.getLayoutParams();
+        layoutParams.width = desiredWidth;
+        layoutParams.height = desiredHeight;
+        snowflake.setLayoutParams(layoutParams);
+
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        int screenHeight = getResources().getDisplayMetrics().heightPixels;
+
+        int startX = screenWidth;
+        int startY = random.nextInt(screenHeight);
+
+        int endX = -snowflake.getWidth(); // 왼쪽 끝으로 이동
+        int endY = random.nextInt(screenHeight);
+
+        int duration = random.nextInt(3000) + 2000; // 2000ms부터 5000ms 사이의 랜덤한 시간 (2초부터 5초)
+
+        ObjectAnimator animatorX = ObjectAnimator.ofFloat(snowflake, "translationX", startX, endX);
+        ObjectAnimator animatorY = ObjectAnimator.ofFloat(snowflake, "translationY", startY, endY);
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(animatorX, animatorY);
+        animatorSet.setDuration(duration); // 애니메이션 지속 시간
+        animatorSet.setInterpolator(new LinearInterpolator());
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                animateSnowflake(snowflake); // 새로운 눈 애니메이션 실행
+            }
+        });
+
+        animatorSet.start();
     }
 
 
