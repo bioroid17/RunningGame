@@ -305,9 +305,12 @@ public class Choice extends AppCompatActivity {
         for(ImageView gashi : gashiPool){
             removeGashi(gashi);
         }
-//        for(List<ImageView> platform : platPool){
-//            removePlatform(platform);
-//        }
+
+        for(int i=0; i<10; i++){
+            for(ImageView platform : platPool.get(i)){
+                removePlatform(i, platform);
+            }
+        }
         score = 0;
     }
     public void onMainMenuButtonClick(View view){
@@ -518,7 +521,6 @@ public class Choice extends AppCompatActivity {
             ImageView plat = new ImageView(this);
             plat.setImageResource(R.drawable.platform);
             plat.setScaleType(ImageView.ScaleType.FIT_XY);
-
 
             plat.setLayoutParams(new ViewGroup.LayoutParams(gashiSize * (i + 1), platSize));
 
