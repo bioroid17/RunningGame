@@ -53,6 +53,23 @@ public class Choice extends AppCompatActivity {
     public int gashiSize = 100; //가시 크기
     private int platSize = 30; //플랫폼의 세로 크기(두께)
     private int platY = 120; //땅의 1단 기본 높이
+
+    //////////
+
+    int jumphei = platY * 2; //최대 점프 높이
+    float gameSpeed = 1;
+    float B = 15f/gameSpeed; //공중정지까지 걸리는 시간. 게임속도와 반비례
+    float A = 2 * jumphei / B;; //시작 속력
+
+    float gravityy = A/B; //중력 크기
+
+    private float objectSpeed = 20 * gameSpeed  ; //가시와 발판 스피드
+
+
+
+    //////////
+
+
     private ImageView ground; //가운데 땅
     private float groundY; //가운데 땅의 중간 Y좌표값
     private RectF playerRect;
@@ -61,7 +78,7 @@ public class Choice extends AppCompatActivity {
     private List<RectF> gashiRect = new ArrayList<>();
     private List<List<RectF>> platRect = new ArrayList<>();
     private float jumpHeight = 50f; //점프 첫속도 (점프하는 힘.)
-    private float gravity = 3.5f; //중력크기
+    private float gravity = A/B; //중력크기
     private boolean isJumping = false; //false일때 점프 가능
     private float translateY = 0; //플레이어 Y값 변경
     private boolean isreversal = false; //true면 반전상태
@@ -97,7 +114,7 @@ public class Choice extends AppCompatActivity {
     //private List<List<Integer>> pD = new ArrayList<>();
 
     int patternNum; //몇번째 패턴을 할건지
-    private float objectSpeed = 20; //가시와 발판 스피드
+
 
     //////////////////////////////////////////
 
@@ -105,7 +122,7 @@ public class Choice extends AppCompatActivity {
     private Runnable gameRunnable = new Runnable() {
         @Override
         public void run() {
-            if(!isPaused) {
+            if(!isPaused && !isDead) {
                 Gravity();
                 rectSetting();
                 GroundCollisionCheck();
@@ -285,7 +302,7 @@ public class Choice extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            scoreTextView.setText("Score: " + score);
+                            scoreTextView.setText("Score: " + score + "   Game Speed " + gameSpeed);
                         }
                     });
                 }
@@ -479,20 +496,28 @@ public class Choice extends AppCompatActivity {
     private void jump(){
         if(!isJumping && (!isreversal && translateY > -gravity*5)||(isreversal&&translateY<gravity*5) && !isJumping){
             isJumping = true;
-            if(!isreversal) translateY = jumpHeight;
-            else translateY = -jumpHeight;
+            if(!isreversal) translateY = A;
+            else translateY = -A;
         }
     }
 
 
     public boolean onKeyDown(int keyCode, KeyEvent event){
-        if(!isPaused) {
+        if(!isPaused && !isDead) {
             if (keyCode == KeyEvent.KEYCODE_Z) {
                 jump();
                 return true;
             }
             if (keyCode == KeyEvent.KEYCODE_X) {
                 reversal();
+                return true;
+            }
+            if(keyCode == KeyEvent.KEYCODE_W){
+                gameSpeedChange(-0.1f);
+                return true;
+            }
+            if(keyCode == KeyEvent.KEYCODE_E){
+                gameSpeedChange(0.1f);
                 return true;
             }
         }
@@ -626,6 +651,16 @@ public class Choice extends AppCompatActivity {
             }
             if(platDeleteNum == 10) nextPatternHandler.post(nextPattern);
         }
+    }
+
+    private void gameSpeedChange(float game_speed){
+        gameSpeed += game_speed;
+        B = 15f/gameSpeed; //공중정지까지 걸리는 시간. 게임속도와 반비례
+        A = 2 * jumphei / B;; //시작 속력
+
+        gravity = A/B; //중력 크기
+
+        objectSpeed = 20 * gameSpeed  ; //가시와 발판 스피드
     }
 
 
