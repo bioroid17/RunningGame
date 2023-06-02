@@ -302,7 +302,7 @@ public class Choice extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            scoreTextView.setText("Score: " + score + "   Game Speed " + gameSpeed);
+                            scoreTextView.setText("Score: " + score + "   Game Speed " + Math.round(gameSpeed*100)/100.0f);
                         }
                     });
                 }
@@ -434,7 +434,7 @@ public class Choice extends AppCompatActivity {
         if(platPool.get(j).get(i).getVisibility() == View.VISIBLE) {
             if (RectF.intersects(playerRect, platRect.get(j).get(i))){
 
-                if(RectF.intersects(playerHeadRect, platRect.get(j).get(i))){
+                /*if(RectF.intersects(playerHeadRect, platRect.get(j).get(i))){
                     while (RectF.intersects(playerRect,platRect.get(j).get(i))){
                         if (!isreversal) {
                             player.offsetTopAndBottom(1);
@@ -444,17 +444,29 @@ public class Choice extends AppCompatActivity {
                         rectSetting();
                     }
                     isJumping = true;
-                } else {
+                } else {*/
                     while (RectF.intersects(playerRect, platRect.get(j).get(i))) {
                         if (!isreversal) {
-                            player.offsetTopAndBottom(-1);
+                            if(translateY < 0) {
+                                player.offsetTopAndBottom(-1);
+                                isJumping = false;
+                            } else if(translateY > 0){
+                                player.offsetTopAndBottom(1);
+                                isJumping = true;
+                            }
                         } else {
-                            player.offsetTopAndBottom(1);
+                            if(translateY > 0) {
+                                player.offsetTopAndBottom(1);
+                                isJumping = false;
+                            } else if( translateY < 0){
+                                player.offsetTopAndBottom(-1);
+                                isJumping = true;
+                            }
                         }
                         rectSetting();
                     }
                     isJumping = false;
-                }
+                //}
                 translateY = 0;
             }
         }
@@ -513,11 +525,11 @@ public class Choice extends AppCompatActivity {
                 return true;
             }
             if(keyCode == KeyEvent.KEYCODE_W){
-                gameSpeedChange(-0.1f);
+                gameSpeedChange(-0.03f);
                 return true;
             }
             if(keyCode == KeyEvent.KEYCODE_E){
-                gameSpeedChange(0.1f);
+                gameSpeedChange(0.03f);
                 return true;
             }
         }
@@ -703,6 +715,7 @@ public class Choice extends AppCompatActivity {
         //patternNum = patternDrawing(0,1);
         System.out.println(maplevel+"번째 맵의"+patNum+"번째 패턴 실행");
         MapList(maplevel,patNum);
+        //SelectPattern(999);
         //patternHandler.post(patternRun);
         SpawnObj();
     }
@@ -899,6 +912,12 @@ public class Choice extends AppCompatActivity {
                 ps(true, 0, gashiSize*2);
                 ps(false, gashiSize * 3, gashiSize*2);
                 ps(true, 0, gashiSize*2);
+                break;
+
+            case 999:
+                ps(false, 0, gashiSize*5);
+                ps(true, gashiSize*4, gashiSize*5);
+
                 break;
         }
     }
