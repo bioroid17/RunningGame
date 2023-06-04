@@ -38,6 +38,10 @@
             android:configChanges="orientation|screenSize"
             android:screenOrientation="landscape"
             android:exported="true"></activity>
+
+        <activity
+            android:name=".ScoreActivity"
+            android:configChanges="orientation|screenSize"></activity>
     </application>
 
 </manifest>

@@ -24,7 +24,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
@@ -40,6 +46,7 @@ public class Choice extends AppCompatActivity {
     private ImageButton restartButton;
     private ImageButton mainmenuButton;
 
+    ScoreManager scoreManager;
     private boolean isPaused = false;
     private boolean isDead = false;
 
@@ -218,6 +225,9 @@ public class Choice extends AppCompatActivity {
         setContentView(R.layout.activity_choice);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        //스코어
+        scoreManager=new ScoreManager(this);
 
         // 화면 가로, 세로 크기
         screenWidth = displayMetrics.widthPixels;
@@ -476,6 +486,8 @@ public class Choice extends AppCompatActivity {
         if(gashiPool.get(i).getVisibility() == View.VISIBLE) {
             if (RectF.intersects(playerRect, gashiRect.get(i))){
                 if(RectF.intersects(playerHeadRect, gashiRect.get(i))){
+
+                    scoreManager.saveScore(score);
                     isDead = true;
                     restartButton.setVisibility(View.VISIBLE);
                     restartTextView.setVisibility(View.VISIBLE);
@@ -486,6 +498,7 @@ public class Choice extends AppCompatActivity {
             }
         }
     }
+
 
     private void reversal(){ //반전 눌렀을때 값들 반전됨
         playerY = player.getY() + player.getHeight() / 2f;
@@ -716,7 +729,8 @@ public class Choice extends AppCompatActivity {
         System.out.println(maplevel+"번째 맵의"+patNum+"번째 패턴 실행");
         MapList(maplevel,patNum);
         //SelectPattern(999);
-        //patternHandler.post(patternRun);
+//        //patternHandler.post(patternRun);
+
         SpawnObj();
     }
 
