@@ -43,6 +43,12 @@ public class Choice extends AppCompatActivity {
     private boolean isPaused = false;
     private boolean isDead = false;
 
+    private RunningEffect runningEffect;
+    private int effSize = 20;
+    private List<RunningEffect> effPool = new ArrayList<>();
+    private int effPoolSize = 100;
+    private int effPoolNum = 0;
+
 
     ////////////////
 
@@ -63,7 +69,10 @@ public class Choice extends AppCompatActivity {
 
     float gravityy = A/B; //중력 크기
 
-    private float objectSpeed = 20 * gameSpeed  ; //가시와 발판 스피드
+    private float objectSpeed = 20 * gameSpeed; //가시와 발판 스피드
+
+    int patternSize = 0;
+    int previousPattern = 999999;
 
 
 
@@ -128,7 +137,7 @@ public class Choice extends AppCompatActivity {
                 GroundCollisionCheck();
             }
 
-            gamehandler.postDelayed(this, 1);
+            gamehandler.postDelayed(this, 10);
         }
     };
 
@@ -237,6 +246,22 @@ public class Choice extends AppCompatActivity {
         mainmenuButton.setVisibility(View.INVISIBLE);
 
 
+        do{
+            gY.clear();
+            gR.clear();
+            gD.clear();
+            gRR.clear();
+            pMD.clear();
+            pMY.clear();
+            pMR.clear();
+            pML.clear();
+            SelectPattern(patternSize);
+            patternSize++;
+        } while(!gY.isEmpty() || !pMY.isEmpty());
+        patternSize -= 2;
+
+
+
         for(int i = 0; i < 10; i++){
             platNum[i] = 0;
             platPoolStart[i] = 0;
@@ -268,6 +293,10 @@ public class Choice extends AppCompatActivity {
 
         for(int i = 0; i < platPoolSize; i++){
             createPlatform();
+        }
+
+        for(int i = 0; i < effPoolSize; i++){
+            createEff();
         }
 
         gamehandler.post(gameRunnable);
@@ -314,7 +343,7 @@ public class Choice extends AppCompatActivity {
         isPaused = !isPaused;
     }
     public void onRestartButtonClick(View view) {
-        isDead = false;
+
         view.setVisibility(View.INVISIBLE);
         restartTextView.setVisibility(View.INVISIBLE);
         mainmenuButton.setVisibility(View.INVISIBLE);
@@ -322,12 +351,15 @@ public class Choice extends AppCompatActivity {
         for(ImageView gashi : gashiPool){
             removeGashi(gashi);
         }
-
         for(int i=0; i<10; i++){
             for(ImageView platform : platPool.get(i)){
                 removePlatform(i, platform);
             }
         }
+        gashiPoolStart = 0; gashiPoolEnd = 0; gashiNum = 0;
+        for(int i = 0; i < 10; i++){ platNum[i] = 0; platPoolStart[i] = 0; platPoolEnd[i] = 0; }
+        nextPatternHandler.post(nextPattern);
+        isDead = false;
         score = 0;
     }
     public void onMainMenuButtonClick(View view){
@@ -401,6 +433,7 @@ public class Choice extends AppCompatActivity {
             }
             isJumping = false; //점프 가능상태
             translateY = 0; //Y 0으로 고정
+            spawnEff();
         }
         for(int j = 0; j < 10; j++) {
             if (platPoolStart[j] < platPoolEnd[j]) {
@@ -432,41 +465,28 @@ public class Choice extends AppCompatActivity {
     }
     private void platCollisionCheck(int j, int i){
         if(platPool.get(j).get(i).getVisibility() == View.VISIBLE) {
-            if (RectF.intersects(playerRect, platRect.get(j).get(i))){
-
-                /*if(RectF.intersects(playerHeadRect, platRect.get(j).get(i))){
-                    while (RectF.intersects(playerRect,platRect.get(j).get(i))){
-                        if (!isreversal) {
-                            player.offsetTopAndBottom(1);
-                        } else {
+            if (RectF.intersects(playerRect, platRect.get(j).get(i))) {
+                while (RectF.intersects(playerRect, platRect.get(j).get(i))) {
+                    if (!isreversal) {
+                        if (translateY < 0) {
                             player.offsetTopAndBottom(-1);
+                            isJumping = false;
+                        } else if (translateY > 0) {
+                            player.offsetTopAndBottom(1);
+                            isJumping = true;
                         }
-                        rectSetting();
-                    }
-                    isJumping = true;
-                } else {*/
-                    while (RectF.intersects(playerRect, platRect.get(j).get(i))) {
-                        if (!isreversal) {
-                            if(translateY < 0) {
-                                player.offsetTopAndBottom(-1);
-                                isJumping = false;
-                            } else if(translateY > 0){
-                                player.offsetTopAndBottom(1);
-                                isJumping = true;
-                            }
-                        } else {
-                            if(translateY > 0) {
-                                player.offsetTopAndBottom(1);
-                                isJumping = false;
-                            } else if( translateY < 0){
-                                player.offsetTopAndBottom(-1);
-                                isJumping = true;
-                            }
+                    } else {
+                        if (translateY > 0) {
+                            player.offsetTopAndBottom(1);
+                            isJumping = false;
+                        } else if (translateY < 0) {
+                            player.offsetTopAndBottom(-1);
+                            isJumping = true;
                         }
-                        rectSetting();
                     }
-                    isJumping = false;
-                //}
+                    rectSetting();
+                }
+                if(!isJumping) { spawnEff(); }
                 translateY = 0;
             }
         }
@@ -532,10 +552,36 @@ public class Choice extends AppCompatActivity {
                 gameSpeedChange(0.03f);
                 return true;
             }
+            if(keyCode == KeyEvent.KEYCODE_R){
+                spawnEff();
+                return true;
+            }
         }
         return super.onKeyDown(keyCode, event);
     }
 
+    private void createEff(){
+        RunningEffect runEff = new RunningEffect();
+        runEff.eff = new ImageView(this);
+        runEff.eff.setImageResource(R.drawable.gashi);
+        runEff.eff.setScaleType(ImageView.ScaleType.FIT_XY);
+        runEff.eff.setLayoutParams(new ViewGroup.LayoutParams(effSize, effSize));
+        Random random = new Random();
+        int angle = random.nextInt(360);
+        runEff.eff.setRotation(angle);
+        effPool.add(runEff);
+        runEff.eff.setVisibility(View.INVISIBLE);
+        ((ViewGroup)findViewById(android.R.id.content)).addView(runEff.eff);
+    }
+    private void spawnEff(){
+        if(isreversal)
+            effPool.get(effPoolNum).spawnEff(objectSpeed, player.getX(), player.getY()-effPool.get(effPoolNum).eff.getHeight(), isreversal);
+        else
+            effPool.get(effPoolNum).spawnEff(objectSpeed, player.getX(), player.getY()+player.getHeight(), isreversal);
+
+        effPoolNum++;
+        if(effPoolNum >= effPoolSize) effPoolNum = 0;
+    }
 
     //맨 처음에 예비용 가시 생성해둠 (현재는 100개)
     private void createGashi(){
@@ -630,38 +676,43 @@ public class Choice extends AppCompatActivity {
 
     private void removeGashi(ImageView gashi){
         gashi.setVisibility(View.INVISIBLE);
-        gashiPoolStart++;
-        if(gashiPoolStart >= gashiPoolSize)
-            gashiPoolStart = 0;
 
-        if(gashiPoolStart == gashiPoolEnd) {
-            int platDeleteNum = 0;
-            for (int i = 0; i < 10; i++) {
-                if (platPoolStart[i] == platPoolEnd[i]) { //전부 사라졌다면 다음 패턴 바로 호출
-                    platDeleteNum++;
+        if(!isDead) {
+            gashiPoolStart++;
+            if (gashiPoolStart >= gashiPoolSize)
+                gashiPoolStart = 0;
+
+            if (gashiPoolStart == gashiPoolEnd) {
+                int platDeleteNum = 0;
+                for (int i = 0; i < 10; i++) {
+                    if (platPoolStart[i] == platPoolEnd[i]) { //전부 사라졌다면 다음 패턴 바로 호출
+                        platDeleteNum++;
+                    }
                 }
-            }
-            if(platDeleteNum == 10) {
-                System.out.println("nextPattern 실행");
-                nextPatternHandler.post(nextPattern);
+                if (platDeleteNum == 10) {
+                    System.out.println("nextPattern 실행");
+                    nextPatternHandler.post(nextPattern);
+                }
             }
         }
     }
 
     private void removePlatform(int i, ImageView platform){
         platform.setVisibility(View.INVISIBLE);
-        platPoolStart[i]++;
-        if(platPoolStart[i] >= platPoolSize)
-            platPoolStart[i] = 0;
+        if(!isDead) {
+            platPoolStart[i]++;
+            if (platPoolStart[i] >= platPoolSize)
+                platPoolStart[i] = 0;
 
-        if(gashiPoolStart == gashiPoolEnd) {
-            int platDeleteNum = 0;
-            for (int j = 0; j < 10; j++) {
-                if (platPoolStart[j] == platPoolEnd[j]) { //전부 사라졌다면 다음 패턴 바로 호출
-                    platDeleteNum++;
+            if (gashiPoolStart == gashiPoolEnd) {
+                int platDeleteNum = 0;
+                for (int j = 0; j < 10; j++) {
+                    if (platPoolStart[j] == platPoolEnd[j]) { //전부 사라졌다면 다음 패턴 바로 호출
+                        platDeleteNum++;
+                    }
                 }
+                if (platDeleteNum == 10) nextPatternHandler.post(nextPattern);
             }
-            if(platDeleteNum == 10) nextPatternHandler.post(nextPattern);
         }
     }
 
@@ -712,9 +763,13 @@ public class Choice extends AppCompatActivity {
     }
 
     private void pattern(){
-        //patternNum = patternDrawing(0,1);
-        System.out.println(maplevel+"번째 맵의"+patNum+"번째 패턴 실행");
-        MapList(maplevel,patNum);
+        do {
+            patternNum = patternDrawing(0, patternSize);
+        } while(patternNum == previousPattern);
+        SelectPattern(patternNum);
+        previousPattern = patternNum;
+        //System.out.println(maplevel+"번째 맵의"+patNum+"번째 패턴 실행");
+        //MapList(maplevel,patNum);
         //SelectPattern(999);
         //patternHandler.post(patternRun);
         SpawnObj();
