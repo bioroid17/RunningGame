@@ -768,10 +768,6 @@ public class Choice extends AppCompatActivity {
         } while(patternNum == previousPattern);
         SelectPattern(patternNum);
         previousPattern = patternNum;
-        //System.out.println(maplevel+"번째 맵의"+patNum+"번째 패턴 실행");
-        //MapList(maplevel,patNum);
-        //SelectPattern(999);
-        //patternHandler.post(patternRun);
         SpawnObj();
     }
 
