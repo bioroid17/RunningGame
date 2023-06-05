@@ -38,7 +38,7 @@ public class RunningEffect {
         eff.setVisibility(View.VISIBLE);
         eff.setX(playerX);
         eff.setY(playerY);
-        randomNum = random.nextFloat() * 7; //일단보류
+        randomNum = random.nextFloat() * 7;
         gamehandler.post(gameRunnable);
 
     }

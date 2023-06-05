@@ -36,7 +36,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 public class Choice extends AppCompatActivity {
-    static int maplevel=0; //0스테이지부터 ~~
+    static int maplevel=0; //0스테이지부터 ~
     static int patNum=0;
     private int score = 0;
     private Timer timer;
