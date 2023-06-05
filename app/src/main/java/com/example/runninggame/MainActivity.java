@@ -69,6 +69,15 @@ public class MainActivity extends AppCompatActivity {
             animateSnowflake(snowflake);
         }
 
+        TextView scoreText = findViewById(R.id.Score);
+        scoreText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         // TextView 객체를 참조합니다.
         TextView textView = findViewById(R.id.my_text_view);

@@ -4,45 +4,113 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
 public class Setting extends AppCompatActivity {
+
+    private LinearLayout volumeControl = null;
+    private Button decreaseButton = null;
+    private Button increaseButton = null;
+    private AudioManager audioManager = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
-        SeekBar volumeSeekBar = findViewById(R.id.volume_bar);
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        volumeControl = findViewById(R.id.volumeControl);
+        decreaseButton = findViewById(R.id.decreaseButton);
+        increaseButton = findViewById(R.id.increaseButton);
+
+
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        // 현재 볼류 값
+        int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+        // 각 버튼의 onClick
+        for (int i = 0; i < volumeControl.getChildCount(); i++) {
+            Button button = (Button) volumeControl.getChildAt(i);
+            int finalI = i;
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //클릭시 볼륨 조절
+                    int volume = finalI * audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) / volumeControl.getChildCount();
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+
+                    // 색깔도 바꿈
+                    for (int j = 0; j < volumeControl.getChildCount(); j++) {
+                        Button otherButton = (Button) volumeControl.getChildAt(j);
+                        if (j <= finalI) {
+                            otherButton.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+                        } else {
+                            otherButton.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+                        }
+                    }
+                }
+            });
+
+            // 볼륨 값에 따라 색깔 바꿈
+            if (i < currentVolume) {
+                button.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+            } else {
+                button.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+            }
+        }
+
+        // - 버튼
+        decreaseButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // SeekBar 값이 변경될 때 호출됩니다.
-                // 볼륨을 변경합니다.
-                int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                int volume = (int) ((float) progress / 100 * maxVolume);
+            public void onClick(View v) {
+                // 볼륨을 1 줄임
+                int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) - 1;
+                if (volume < 0) {
+                    volume = 0;
+                }
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
-            }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                // SeekBar에서 터치가 시작될 때 호출됩니다.
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                // SeekBar에서 터치가 종료될 때 호출됩니다.
+                // 색깔 바꿈
+                for (int i = 0; i < volumeControl.getChildCount(); i++) {
+                    Button button = (Button) volumeControl.getChildAt(i);
+                    if (i < volume) {
+                        button.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+                    } else {
+                        button.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+                    }
+                }
             }
         });
 
-// 현재 볼륨 값을 가져와서 SeekBar의 초기 값으로 설정합니다.
-        int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        int initialProgress = (int) ((float) currentVolume / maxVolume * 100);
-        volumeSeekBar.setProgress(initialProgress);
+        increaseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // +버튼
+                int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) + 1;
+                if (volume > audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)) {
+                    volume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                }
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
 
+                // 색깔 바꿈
+                for (int i = 0; i < volumeControl.getChildCount(); i++) {
+                    Button button = (Button) volumeControl.getChildAt(i);
+                    if (i < volume) {
+                        button.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+                    } else {
+                        button.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+                    }
+                }
+            }
+        });
     }
 }
