@@ -26,6 +26,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,13 +35,12 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewGroup rootView;
     private Random random;
-    private ImageView backgroundImage;
     private Button bt_m_play;
     private MediaPlayer mediaPlayer;
     private AnimationSet animationSet;
     private ImageView character;
     private int screenWidth;
-
+    private ScoreManager scoreManager;
 
 
 
@@ -57,19 +58,21 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
         maptemp.setmap();
-
+        scoreManager = new ScoreManager(this);
         rootView = findViewById(android.R.id.content);
         random = new Random();
-
+        int firstscore=scoreManager.firstScore();
         for (int i = 0; i < 30; i++) { // 20개의 눈을 생성
             ImageView snowflake = new ImageView(MainActivity.this);
-            snowflake.setImageResource(R.drawable.snowflake_image);
+            snowflake.setImageResource(R.drawable.snowflake_image2); //눈이미지 변경
             rootView.addView(snowflake);
 
             animateSnowflake(snowflake);
         }
 
         TextView scoreText = findViewById(R.id.Score);
+        TextView firstScore= findViewById(R.id.firstscore);
+        firstScore.setText("Top: " + firstscore); // 텍스트 변경
         scoreText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,12 +85,19 @@ public class MainActivity extends AppCompatActivity {
         // TextView 객체를 참조합니다.
         TextView textView = findViewById(R.id.my_text_view);
         textView.setAlpha(0);
+        scoreText.setAlpha(0);
+        firstScore.setAlpha(0);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 textView.setAlpha(1);
+                scoreText.setAlpha(1);
+                firstScore.setAlpha(1);
                 Animation animation = new TranslateAnimation(0, 0, -100, 0);
                 animation.setDuration(700);
+
+                scoreText.startAnimation(animation);
+                firstScore.startAnimation(animation);
                 textView.startAnimation(animation);
             }
         }, 1500);
@@ -132,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent NEXT = new Intent(MainActivity.this, Choice.class);
                 startActivity(NEXT);
-                jumpAndTranslate();
+//                jumpAndTranslate();
             }
         });
 
@@ -160,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
     private void animateSnowflake(final ImageView snowflake) {
         // 눈의 크기 조정
         int desiredWidth = 10;
-        int desiredHeight = 10;
+        int desiredHeight = 30;
 
         ViewGroup.LayoutParams layoutParams = snowflake.getLayoutParams();
         layoutParams.width = desiredWidth;
@@ -176,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         int endX = -snowflake.getWidth(); // 왼쪽 끝으로 이동
         int endY = random.nextInt(screenHeight);
 
-        int duration = random.nextInt(4000) + 4000; // 4000ms부터 8000 사이의 랜덤한 시간 (2초부터 5초)
+        int duration = random.nextInt(5000) + 4000; // 4000ms부터 8000 사이의 랜덤한 시간 (2초부터 5초)
 
         ObjectAnimator animatorX = ObjectAnimator.ofFloat(snowflake, "translationX", startX, endX);
         ObjectAnimator animatorY = ObjectAnimator.ofFloat(snowflake, "translationY", startY, endY);

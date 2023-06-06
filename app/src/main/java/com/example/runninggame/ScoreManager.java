@@ -65,4 +65,8 @@ public class ScoreManager {
         }
         return allScores;
     }
+
+    public int firstScore() {
+        return getTopScores().get(0);
+    }
 }

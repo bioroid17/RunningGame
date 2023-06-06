@@ -7,6 +7,7 @@ public class maptemp {
 
     public static void setmap() {
         System.out.println("setmap 호출");
+
         for (int i = 0; i < 5; i++) {
             stagelevel[i] = new ArrayList<Integer>();
         }

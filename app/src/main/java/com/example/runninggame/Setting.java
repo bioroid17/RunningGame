@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 public class Setting extends AppCompatActivity {
 
@@ -36,6 +38,16 @@ public class Setting extends AppCompatActivity {
 
         // 현재 볼류 값
         int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        TextView closeButton = findViewById(R.id.exit);
+
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Setting.this, MainActivity.class);
+                startActivity(intent);
+                finish(); // 선택적: ScoreActivity를 종료하여 백스택에서 제거합니다.
+            }
+        });
 
         // 각 버튼의 onClick
         for (int i = 0; i < volumeControl.getChildCount(); i++) {

@@ -4,6 +4,10 @@ import static com.example.runninggame.maptemp.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -18,6 +22,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -36,6 +41,11 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 public class Choice extends AppCompatActivity {
+    private ObjectAnimator animatorX;
+    private ObjectAnimator animatorY;
+    private boolean isAnimationPaused = false;
+    private ViewGroup rootView; //눈 이미지 그룹
+    private Random random;
     static int maplevel=0; //0스테이지부터 ~
     static int patNum=0;
     private int score = 0;
@@ -235,6 +245,15 @@ public class Choice extends AppCompatActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
+        rootView = findViewById(android.R.id.content);
+        random = new Random();
+//        for (int i = 0; i < 30; i++) { // 30개의 눈을 생성
+//            ImageView snowflake = new ImageView(Choice.this);
+//            snowflake.setImageResource(R.drawable.snowflake_image2); //눈이미지 변경
+//            rootView.addView(snowflake);
+////            animateSnowflake(snowflake);
+//        }
+
         //스코어
         scoreManager=new ScoreManager(this);
 
@@ -313,6 +332,65 @@ public class Choice extends AppCompatActivity {
         moveHandler.post(moveObjects);
         moveHandler.postDelayed(nextPattern, 1000);
     }
+
+    private void animateSnowflake(final ImageView snowflake) {
+        // 눈의 크기 조정
+        int desiredWidth = 10;
+        int desiredHeight = 30;
+
+        ViewGroup.LayoutParams layoutParams = snowflake.getLayoutParams();
+        layoutParams.width = desiredWidth;
+        layoutParams.height = desiredHeight;
+        snowflake.setLayoutParams(layoutParams);
+
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        int screenHeight = getResources().getDisplayMetrics().heightPixels;
+
+        int startX = screenWidth;
+        int startY = random.nextInt(screenHeight);
+
+        int endX = -snowflake.getWidth(); // 왼쪽 끝으로 이동
+        int endY = random.nextInt(screenHeight);
+
+        int duration = random.nextInt(5000) + 4000; // 4000ms부터 8000 사이의 랜덤한 시간 (2초부터 5초)
+
+        animatorX = ObjectAnimator.ofFloat(snowflake, "translationX", startX, endX);
+        animatorY = ObjectAnimator.ofFloat(snowflake, "translationY", startY, endY);
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(animatorX, animatorY);
+        animatorSet.setDuration(duration); // 애니메이션 지속 시간
+        animatorSet.setInterpolator(new LinearInterpolator());
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!isAnimationPaused) {
+                    animateSnowflake(snowflake); // 다시 애니메이션 시작
+                } // 새로운 눈 애니메이션 실행
+            }
+        });
+
+        animatorSet.start();
+    }
+
+    // 애니메이션 일시정지
+    private void pauseAnimation() {
+        if (animatorX != null && animatorY != null) {
+            isAnimationPaused = true;
+            animatorX.pause();
+            animatorY.pause();
+        }
+    }
+
+    // 애니메이션 다시 시작
+    private void resumeAnimation() {
+        if (animatorX != null && animatorY != null) {
+            isAnimationPaused = false;
+            animatorX.resume();
+            animatorY.resume();
+        }
+    }
+
 
     protected void onResume(){
         super.onResume();
@@ -804,21 +882,18 @@ public class Choice extends AppCompatActivity {
 //        gs() 위/아래 , 거리 , 공중
         switch (select){
             case 0:
-
                 gs(true);
                 gs(false);
                 gs(true, 200);
                 gs(false, 0);
                 gs(false, 300, 0);
                 gs(true, 200, 1);
-
-
                 ps(false, 100, gashiSize);
                 ps(false, gashiSize*2+400, gashiSize);
                 ps(true, 200, gashiSize);
                 break;
-            case 1:
 
+            case 1:
                 gs(false, 0); gs(true, 0); gs(true, 0, 0);
                 gs(false); gs(true, 0); gs(true, 0, 0);
                 gs(false); gs(true, 0); gs(true, 0, 0);
@@ -849,7 +924,6 @@ public class Choice extends AppCompatActivity {
                     ps(true, 800, gashiSize*3);
                     ps(false, 0, gashiSize*3);
                 }
-
                 //ps(true, 10000, 100);
                 break;
 
