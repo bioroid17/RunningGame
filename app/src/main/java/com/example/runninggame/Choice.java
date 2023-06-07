@@ -4,6 +4,7 @@ import static com.example.runninggame.maptemp.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.view.MotionEvent;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -26,6 +27,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,7 +71,10 @@ public class Choice extends AppCompatActivity {
 
     ////////////////
 
+
+
     private ImageView instance;
+    private ImageView speedUpText;
 
     public ImageView player;
     public int playerSize = 70; //플레이어 크기
@@ -140,6 +145,8 @@ public class Choice extends AppCompatActivity {
     //private List<List<Integer>> pD = new ArrayList<>();
 
     int patternNum; //몇번째 패턴을 할건지
+    int speedUpNum = 3;
+    int speedUpCount = -1;
 
 
     //////////////////////////////////////////
@@ -155,6 +162,30 @@ public class Choice extends AppCompatActivity {
             }
 
             gamehandler.postDelayed(this, 10);
+        }
+    };
+
+    int speedUpBlinkNum = 0;
+    private Handler speedUpHandler = new Handler();
+    private Runnable speedUpRunable = new Runnable() {
+        @Override
+        public void run() {
+            if(speedUpText.getVisibility() == View.INVISIBLE){
+                speedUpText.setVisibility(View.VISIBLE);
+            } else {
+                speedUpText.setVisibility(View.INVISIBLE);
+            }
+
+            if(!isDead) {
+                if (!isPaused) speedUpBlinkNum++;
+
+                if (speedUpBlinkNum < 10) {
+                    float delayy = 100 / gameSpeed;
+                    speedUpHandler.postDelayed(this, (int) delayy);
+                }
+            } else {
+                speedUpText.setVisibility(View.INVISIBLE);
+            }
         }
     };
 
@@ -228,6 +259,13 @@ public class Choice extends AppCompatActivity {
             pMY.clear();
             pMR.clear();
             pML.clear();
+
+            speedUpCount++;
+            if(speedUpCount >= speedUpNum){
+                speedUpCount = 0;
+                gameSpeedChange(0.03f);
+            }
+
             pattern();
         }
     };
@@ -300,6 +338,16 @@ public class Choice extends AppCompatActivity {
         }
 
 
+        speedUpText = new ImageView(this);
+        speedUpText.setImageResource(R.drawable.speed_up);
+        ((ViewGroup)findViewById(android.R.id.content)).addView(speedUpText);
+        speedUpText.getLayoutParams().width = screenWidth / 3;
+        speedUpText.getLayoutParams().height = speedUpText.getLayoutParams().width / 4;
+        speedUpText.setScaleType(ImageView.ScaleType.FIT_XY);
+        speedUpText.setX(screenWidth/2 - screenWidth/6);
+        speedUpText.setY(screenHeight/4 - screenHeight/24);
+        speedUpText.setVisibility(View.INVISIBLE);
+
         //player = findViewById(R.id.player);
         player = new ImageView(this);
         player.setImageResource(R.drawable.player);
@@ -331,6 +379,30 @@ public class Choice extends AppCompatActivity {
         gamehandler.post(gameRunnable);
         moveHandler.post(moveObjects);
         moveHandler.postDelayed(nextPattern, 1000);
+
+        View view = findViewById(R.id.deltaRelative);
+       view.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event){
+                int screenWidth = v.getWidth();
+                int screenHeight = v.getHeight();
+                float touchX = event.getX();
+                float touchY = event.getY();
+
+                if(!isDead && !isPaused) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        if (touchY > screenHeight / 5) {
+                            if (touchX < screenWidth / 2) { //왼쪽 터치
+                                reversal();
+                            } else { // 오른쪽 터치
+                                jump();
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+        });
+
     }
 
     private void animateSnowflake(final ImageView snowflake) {
@@ -436,6 +508,13 @@ public class Choice extends AppCompatActivity {
         restartTextView.setVisibility(View.INVISIBLE);
         mainmenuButton.setVisibility(View.INVISIBLE);
         mainmenuTextView.setVisibility(View.INVISIBLE);
+        player.setY(groundY - ground.getHeight()/2f - player.getHeight());
+        isreversal = false;
+        speedUpCount = -1;
+        gameSpeed = 1;
+        gameSpeedChange(0);
+        translateY = 0;
+
         for(ImageView gashi : gashiPool){
             removeGashi(gashi);
         }
@@ -587,6 +666,7 @@ public class Choice extends AppCompatActivity {
 
                     scoreManager.saveScore(score);
                     isDead = true;
+                    speedUpText.setVisibility(View.INVISIBLE);
                     restartButton.setVisibility(View.VISIBLE);
                     restartTextView.setVisibility(View.VISIBLE);
                     scoreTextView.setVisibility(View.VISIBLE);
@@ -815,6 +895,11 @@ public class Choice extends AppCompatActivity {
         gravity = A/B; //중력 크기
 
         objectSpeed = 20 * gameSpeed  ; //가시와 발판 스피드
+
+        if(game_speed != 0) {
+            speedUpBlinkNum = 0;
+            speedUpHandler.post(speedUpRunable);
+        }
     }
 
 
