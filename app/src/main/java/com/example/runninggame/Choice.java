@@ -1279,7 +1279,7 @@ public class Choice extends AppCompatActivity {
                 ps(true, gashiSize*4, gashiSize*5);
 
                 break;
-
+/*
             case 0:
                 gs(false, 0); gs(false); gs(false);
                 ps(true, 0, gashiSize*3);
@@ -1288,7 +1288,7 @@ public class Choice extends AppCompatActivity {
                 gs(false, 0); gs(false); gs(false);
                 ps(true, 0, gashiSize*3);
                 break;
-
+*/
         }
     }
 }//좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.
