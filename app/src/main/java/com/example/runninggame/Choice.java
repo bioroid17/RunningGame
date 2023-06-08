@@ -68,6 +68,9 @@ public class Choice extends AppCompatActivity {
     private int effPoolSize = 100;
     private int effPoolNum = 0;
 
+    private List<DeadEffect> deadEffPool = new ArrayList<>();
+    private int deadEffPoolSize = 50;
+
 
     ////////////////
 
@@ -83,6 +86,8 @@ public class Choice extends AppCompatActivity {
     private int platY = 120; //땅의 1단 기본 높이
 
     //////////
+
+    boolean jumpPress = false;
 
     int jumphei = platY * 2; //최대 점프 높이
     float gameSpeed = 1;
@@ -156,6 +161,7 @@ public class Choice extends AppCompatActivity {
         @Override
         public void run() {
             if(!isPaused && !isDead) {
+                if(jumpPress){ jump(); }
                 Gravity();
                 rectSetting();
                 GroundCollisionCheck();
@@ -375,6 +381,9 @@ public class Choice extends AppCompatActivity {
         for(int i = 0; i < effPoolSize; i++){
             createEff();
         }
+        for(int i = 0; i < deadEffPoolSize; i++){
+            createDeadEff();
+        }
 
         gamehandler.post(gameRunnable);
         moveHandler.post(moveObjects);
@@ -393,8 +402,15 @@ public class Choice extends AppCompatActivity {
                         if (touchY > screenHeight / 5) {
                             if (touchX < screenWidth / 2) { //왼쪽 터치
                                 reversal();
-                            } else { // 오른쪽 터치
-                                jump();
+                            } else {
+                                jumpPress = true;
+                            }
+                        }
+                    }
+                    if(event.getAction() == MotionEvent.ACTION_UP) {
+                        if (touchY > screenHeight / 5) {
+                            if (touchX > screenWidth / 2) {
+                                jumpPress = false;
                             }
                         }
                     }
@@ -496,7 +512,7 @@ public class Choice extends AppCompatActivity {
                     });
                 }
             }
-        }, 100, 100); // 0.1초마다 실행
+        }, 100, (int)(50/(gameSpeed + ((gameSpeed - 1) * 300)))); // 0.1초마다 실행
     }
 
     public void onPauseButtonClick(View view) {
@@ -505,6 +521,7 @@ public class Choice extends AppCompatActivity {
     public void onRestartButtonClick(View view) {
 
         view.setVisibility(View.INVISIBLE);
+        player.setVisibility(View.VISIBLE);
         restartTextView.setVisibility(View.INVISIBLE);
         mainmenuButton.setVisibility(View.INVISIBLE);
         mainmenuTextView.setVisibility(View.INVISIBLE);
@@ -672,6 +689,9 @@ public class Choice extends AppCompatActivity {
                     scoreTextView.setVisibility(View.VISIBLE);
                     mainmenuButton.setVisibility(View.VISIBLE);
                     mainmenuTextView.setVisibility(View.VISIBLE);
+
+                    player.setVisibility(View.INVISIBLE);
+                    spawnDeadEff();
                 }
             }
         }
@@ -731,6 +751,30 @@ public class Choice extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+
+    private void createDeadEff(){
+        DeadEffect deadeff = new DeadEffect();
+        deadeff.deadEff = new ImageView(this);
+        deadeff.deadEff.setImageResource(R.drawable.player);
+        deadeff.deadEff.setScaleType(ImageView.ScaleType.FIT_XY);
+        Random random = new Random();
+        int size = random.nextInt(20) + 30;
+        deadeff.deadEff.setLayoutParams(new ViewGroup.LayoutParams(size, size));
+        int angle = random.nextInt(360);
+        deadeff.deadEff.setRotation(angle);
+        deadeff.deadEff.setVisibility(View.INVISIBLE);
+        deadEffPool.add(deadeff);
+        deadeff.size = size;
+        ((ViewGroup)findViewById(android.R.id.content)).addView(deadeff.deadEff);
+
+    }
+    private void spawnDeadEff(){
+        for(int i = 0; i < deadEffPoolSize; i++) {
+
+            deadEffPool.get(i).spawnDeadEff(objectSpeed, player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2);
+
+        }
+    }
     private void createEff(){
         RunningEffect runEff = new RunningEffect();
         runEff.eff = new ImageView(this);
@@ -966,7 +1010,7 @@ public class Choice extends AppCompatActivity {
     public void SelectPattern(int select){ //여기에 패턴 만들고 패턴번호 붙이면 됨 사용은 maptemp에서 stagelevel list에 add(패턴숫자)하면 됨
 //        gs() 위/아래 , 거리 , 공중
         switch (select){
-            case 0:
+           /* case 0:
                 gs(true);
                 gs(false);
                 gs(true, 200);
@@ -1136,12 +1180,22 @@ public class Choice extends AppCompatActivity {
                 ps(false, gashiSize * 3, gashiSize*2);
                 ps(true, 0, gashiSize*2);
                 break;
-
+*/
             case 999:
                 ps(false, 0, gashiSize*5);
                 ps(true, gashiSize*4, gashiSize*5);
 
                 break;
+
+            case 0:
+                gs(false, 0); gs(false); gs(false);
+                ps(true, 0, gashiSize*3);
+                break;
+            case 1:
+                gs(false, 0); gs(false); gs(false);
+                ps(true, 0, gashiSize*3);
+                break;
+
         }
     }
 }//좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.

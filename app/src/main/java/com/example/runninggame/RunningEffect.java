@@ -20,9 +20,9 @@ public class RunningEffect {
             if(eff.getX() + eff.getWidth() > 0) {
                 eff.setX(eff.getX() - objectSpeed);
                 if(isreversal)
-                    eff.setY(eff.getY() + randomNum);
+                    eff.setY(eff.getY() + (randomNum * objectSpeed/20));
                 else
-                    eff.setY(eff.getY() - randomNum);
+                    eff.setY(eff.getY() - (randomNum * objectSpeed/20));
 
                 gamehandler.postDelayed(this, 1);
             }
