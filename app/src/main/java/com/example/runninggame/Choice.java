@@ -9,10 +9,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -52,11 +56,15 @@ public class Choice extends AppCompatActivity {
     static int patNum=0;
     private int score = 0;
     private Timer timer;
+    private View menuview;
     private TextView scoreTextView;
     private TextView restartTextView;
     private  TextView mainmenuTextView;
+    private  TextView resumeTextView;
+    private ImageButton pauseButton;
     private ImageButton restartButton;
     private ImageButton mainmenuButton;
+    private ImageButton resumeButton;
 
     ScoreManager scoreManager;
     private boolean isPaused = false;
@@ -302,16 +310,9 @@ public class Choice extends AppCompatActivity {
         scoreTextView = findViewById(R.id.score_text_view);
         startTimer();
 
-        restartTextView = findViewById(R.id.restart_text);
-        restartTextView.setVisibility(View.INVISIBLE);
-        restartButton = findViewById(R.id.restart_button);
-        restartButton.setVisibility(View.INVISIBLE);
-
-        mainmenuTextView = findViewById(R.id.mainmenu_text);
-        mainmenuTextView.setVisibility(View.INVISIBLE);
-        mainmenuButton = findViewById(R.id.mainmenu_button);
-        mainmenuButton.setVisibility(View.INVISIBLE);
-
+        pauseButton = findViewById(R.id.pause_button);
+        pauseButton.setX(screenWidth - pauseButton.getLayoutParams().width);
+        pauseButton.setY(0);
 
         do{
             gY.clear();
@@ -379,6 +380,78 @@ public class Choice extends AppCompatActivity {
         gamehandler.post(gameRunnable);
         moveHandler.post(moveObjects);
         moveHandler.postDelayed(nextPattern, 1000);
+
+
+        menuview = new View(this);
+        menuview.setVisibility(View.INVISIBLE);
+        menuview.setBackgroundColor(Color.GRAY);
+        menuview.setLayoutParams(new ViewGroup.LayoutParams(screenWidth*11/16, screenHeight*11/16));
+        menuview.setX(screenWidth*5/32);
+        menuview.setY(screenHeight*5/32);
+        ((ViewGroup)findViewById(android.R.id.content)).addView(menuview);
+
+        restartTextView = new TextView(this);
+        restartTextView.setVisibility(View.INVISIBLE);
+        restartTextView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        restartTextView.setGravity(View.TEXT_ALIGNMENT_CENTER);
+        restartTextView.setTextColor(Color.WHITE);
+        restartTextView.setTextSize(30);
+        restartTextView.setBackgroundColor(Color.TRANSPARENT);
+        restartTextView.setX(screenWidth*9/32);
+        restartTextView.setY(screenHeight/4);
+        restartTextView.setText("다시 시작");
+        ((ViewGroup)findViewById(android.R.id.content)).addView(restartTextView);
+
+        restartButton = new ImageButton(this);
+        restartButton.setVisibility(View.INVISIBLE);
+        restartButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        restartButton.setX(screenWidth*5/16);
+        restartButton.setY(screenHeight/2);
+        restartButton.setImageResource(android.R.drawable.stat_notify_sync);
+        restartButton.setOnClickListener(v -> onRestartButtonClick(v));
+        ((ViewGroup)findViewById(android.R.id.content)).addView(restartButton);
+
+        mainmenuTextView = new TextView(this);
+        mainmenuTextView.setVisibility(View.INVISIBLE);
+        mainmenuTextView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        mainmenuTextView.setGravity(View.TEXT_ALIGNMENT_CENTER);
+        mainmenuTextView.setTextColor(Color.WHITE);
+        mainmenuTextView.setTextSize(30);
+        mainmenuTextView.setBackgroundColor(Color.TRANSPARENT);
+        mainmenuTextView.setX(screenWidth*17/32);
+        mainmenuTextView.setY(screenHeight/4);
+        mainmenuTextView.setText("메인으로");
+        ((ViewGroup)findViewById(android.R.id.content)).addView(mainmenuTextView);
+
+        mainmenuButton = new ImageButton(this);
+        mainmenuButton.setVisibility(View.INVISIBLE);
+        mainmenuButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        mainmenuButton.setX(screenWidth*9/16);
+        mainmenuButton.setY(screenHeight/2);
+        mainmenuButton.setImageResource(android.R.drawable.ic_menu_revert);
+        mainmenuButton.setOnClickListener(v -> onMainMenuButtonClick(v));
+        ((ViewGroup)findViewById(android.R.id.content)).addView(mainmenuButton);
+
+        resumeTextView = new TextView(this);
+        resumeTextView.setVisibility(View.INVISIBLE);
+        resumeTextView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        resumeTextView.setGravity(View.TEXT_ALIGNMENT_CENTER);
+        resumeTextView.setTextColor(Color.WHITE);
+        resumeTextView.setTextSize(30);
+        resumeTextView.setBackgroundColor(Color.TRANSPARENT);
+        resumeTextView.setX(screenWidth*9/32);
+        resumeTextView.setY(screenHeight/4);
+        resumeTextView.setText("계속하기");
+        ((ViewGroup)findViewById(android.R.id.content)).addView(resumeTextView);
+
+        resumeButton = new ImageButton(this);
+        resumeButton.setVisibility(View.INVISIBLE);
+        resumeButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        resumeButton.setX(screenWidth*5/16);
+        resumeButton.setY(screenHeight/2);
+        resumeButton.setImageResource(android.R.drawable.ic_media_play);
+        resumeButton.setOnClickListener(v -> onResumeButtonClick(v));
+        ((ViewGroup)findViewById(android.R.id.content)).addView(resumeButton);
 
         View view = findViewById(R.id.deltaRelative);
        view.setOnTouchListener(new View.OnTouchListener() {
@@ -500,11 +573,18 @@ public class Choice extends AppCompatActivity {
     }
 
     public void onPauseButtonClick(View view) {
-        isPaused = !isPaused;
+        pauseButton.setVisibility(View.INVISIBLE);
+        isPaused = true;
+        menuview.setVisibility(View.VISIBLE);
+        mainmenuTextView.setVisibility(View.VISIBLE);
+        mainmenuButton.setVisibility(View.VISIBLE);
+        resumeTextView.setVisibility(View.VISIBLE);
+        resumeButton.setVisibility(View.VISIBLE);
     }
     public void onRestartButtonClick(View view) {
-
+        pauseButton.setVisibility(View.VISIBLE);
         view.setVisibility(View.INVISIBLE);
+        menuview.setVisibility(View.INVISIBLE);
         restartTextView.setVisibility(View.INVISIBLE);
         mainmenuButton.setVisibility(View.INVISIBLE);
         mainmenuTextView.setVisibility(View.INVISIBLE);
@@ -530,6 +610,17 @@ public class Choice extends AppCompatActivity {
         score = 0;
     }
     public void onMainMenuButtonClick(View view){
+        finish();
+    }
+
+    public void onResumeButtonClick(View view){
+        pauseButton.setVisibility(View.VISIBLE);
+        isPaused = false;
+        menuview.setVisibility(View.INVISIBLE);
+        mainmenuTextView.setVisibility(View.INVISIBLE);
+        mainmenuButton.setVisibility(View.INVISIBLE);
+        resumeTextView.setVisibility(View.INVISIBLE);
+        resumeButton.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -665,7 +756,9 @@ public class Choice extends AppCompatActivity {
                 if(RectF.intersects(playerHeadRect, gashiRect.get(i))){
 
                     scoreManager.saveScore(score);
+                    pauseButton.setVisibility(View.INVISIBLE);
                     isDead = true;
+                    menuview.setVisibility(View.VISIBLE);
                     speedUpText.setVisibility(View.INVISIBLE);
                     restartButton.setVisibility(View.VISIBLE);
                     restartTextView.setVisibility(View.VISIBLE);

@@ -27,81 +27,10 @@
 
     <ImageButton
         android:id="@+id/pause_button"
-        android:layout_width="81dp"
+        android:layout_width="69dp"
         android:layout_height="69dp"
-        android:layout_below="@+id/score_text_view"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="614dp"
-        android:layout_marginTop="253dp"
-        android:layout_marginEnd="37dp"
-        android:layout_marginBottom="35dp"
         android:contentDescription="score_description"
         android:onClick="onPauseButtonClick"
         app:srcCompat="@android:drawable/ic_media_pause" />
-
-    <TextView
-        android:id="@+id/restart_text"
-        android:layout_width="142dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/score_text_view"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="153dp"
-        android:layout_marginTop="9dp"
-        android:background="@android:color/transparent"
-        android:gravity="center"
-        android:text="Restart?"
-        android:textColor="@color/white"
-        android:textSize="30sp"
-        android:textStyle="bold" />
-
-    <ImageButton
-        android:id="@+id/restart_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/restart_text"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="179dp"
-        android:layout_marginTop="17dp"
-        android:layout_marginEnd="461dp"
-        android:layout_marginBottom="234dp"
-        android:contentDescription="tap_to_restart"
-        android:onClick="onRestartButtonClick"
-        app:srcCompat="@android:drawable/stat_notify_sync" />
-
-    <TextView
-        android:id="@+id/mainmenu_text"
-        android:layout_width="183dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/score_text_view"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="130dp"
-        android:layout_marginTop="11dp"
-        android:layout_marginEnd="123dp"
-        android:layout_toEndOf="@+id/restart_text"
-        android:background="@android:color/transparent"
-        android:gravity="center"
-        android:text="Main Menu?"
-        android:textColor="@color/white"
-        android:textSize="30sp"
-        android:textStyle="bold" />
-
-    <ImageButton
-        android:id="@+id/mainmenu_button"
-        android:layout_width="97dp"
-        android:layout_height="61dp"
-        android:layout_below="@+id/mainmenu_text"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="469dp"
-        android:layout_marginTop="13dp"
-        android:layout_marginEnd="165dp"
-        android:layout_marginBottom="232dp"
-        android:contentDescription="tap_to_main"
-        app:srcCompat="?attr/actionModeCloseDrawable" />
 
 </RelativeLayout>
