@@ -98,7 +98,7 @@ public class Choice extends AppCompatActivity {
     boolean jumpPress = false;
 
     int jumphei = platY * 2; //최대 점프 높이
-    float gameSpeed = 1;
+    float gameSpeed = 0.7f;
     float B = 15f/gameSpeed; //공중정지까지 걸리는 시간. 게임속도와 반비례
     float A = 2 * jumphei / B;; //시작 속력
 
@@ -374,7 +374,7 @@ public class Choice extends AppCompatActivity {
             speedUpCount++;
             if(speedUpCount >= speedUpNum){
                 speedUpCount = 0;
-                gameSpeedChange(0.03f);
+                gameSpeedChange(0.08f);
             }
 
             pattern();
@@ -686,7 +686,7 @@ public class Choice extends AppCompatActivity {
                     });
                 }
             }
-        }, 100, (int)(50/(gameSpeed + ((gameSpeed - 1) * 300)))); // 0.1초마다 실행
+        }, 100, 100); // 0.1초마다 실행
     }
 
     public void onPauseButtonClick(View view) {
@@ -709,7 +709,7 @@ public class Choice extends AppCompatActivity {
         player.setY(groundY - ground.getHeight()/2f - player.getHeight());
         isreversal = false;
         speedUpCount = -1;
-        gameSpeed = 1;
+        gameSpeed = 0.7f;
         gameSpeedChange(0);
         translateY = 0;
 
@@ -1193,7 +1193,7 @@ public class Choice extends AppCompatActivity {
         patternCount++;
         isPatternOut.set(patternNum, true);
         if(patternCount > patternSize) {patternCount = 0; for(int i = 0; i <= patternSize; i++) {isPatternOut.set(i, false);}}
-        //patternNum = 0;
+        //patternNum = 9; //6번 가시 하나 줄이기
         SelectPattern(patternNum);
         previousPattern = patternNum;
         SpawnObj();
@@ -1232,7 +1232,212 @@ public class Choice extends AppCompatActivity {
 //        gs() 위/아래 , 거리 , 공중
         switch (select){
 
-            case 0:
+            case 1:
+                gs(true);gs(true);gs(true);gs(true); //4개
+                gs(true);gs(false,0);gs(true);gs(false,0); //2개
+                ps(false, gashiSize*6, gashiSize*4);
+                for(int i=0;i<5;i++){
+                    gs(true);gs(false,0);
+                }
+                gs(false);
+                gs(false);
+                ps(true,gashiSize*10,gashiSize*4);
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(true,0,0);
+                gs(false);
+                gs(true,0,0);
+                gs(false);
+                gs(true,0,0);
+                gs(false);
+                gs(true,0,0);
+                gs(false);
+                gs(false);
+                break;
+            case 2:
+                gs(true);gs(true);gs(true);gs(true); //4개
+                gs(true);gs(false,0);gs(true);gs(false,0); //2개
+                ps(false, gashiSize*6, gashiSize*4);
+                ps(true, 0, gashiSize*4);
+                for(int i=0;i<4;i++){
+                    gs(false,0,0);
+                    gs(true);gs(false,0);
+                }
+                gs(false);
+                gs(false);
+                ps(true,gashiSize*9,gashiSize*4);
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(true,0,0);
+                gs(false);
+                gs(true,0,0);
+                gs(false);
+                gs(true,0,0);
+                gs(false);
+                gs(true,0,0);
+                gs(false);
+                gs(false);
+                break;
+
+            case 3:
+                gs(true);gs(true);gs(true);gs(true); //4개
+                gs(true);gs(false,0);gs(true);gs(false,0); //2개
+                ps(false, gashiSize*6, gashiSize*4);
+                ps(true, 0, gashiSize*4);
+                for(int i=0;i<4;i++){
+                    gs(false,0,0);
+                    gs(true);gs(false,0);
+                }
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(true);
+                break;
+            case 5:
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                ps(true,gashiSize*6,gashiSize*4);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                ps(false,gashiSize*4,gashiSize*4);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(true);
+                break;
+            case 6:
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(false,0);
+                ps(false,gashiSize*10,gashiSize*4);
+                gs(true);
+                gs(false,0);
+                gs(true);
+                gs(false,0);
+                gs(true);
+                gs(false,0);
+                gs(true);gs(true);gs(true);gs(true);gs(true);
+
+            case 7:
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(true);
+
+                ps(false,gashiSize*10,gashiSize*4);
+                gs(false,gashiSize,0);
+                gs(false,gashiSize,0);
+                gs(false,gashiSize,0);
+                gs(false,0);
+                gs(false,gashiSize,0);
+                gs(false,0);
+                gs(true);
+                gs(false,0);
+                gs(true);
+                gs(false,0);
+                gs(true);
+                gs(false,0);
+                gs(false);
+                gs(false);
+                break;
+
+            case 8:
+                gs(false);gs(false);gs(false);
+                ps(false,gashiSize*4,gashiSize*4);
+                gs(false);gs(true,0);
+                gs(false);gs(true,0);
+                gs(false);gs(true,0);
+                gs(false);gs(true,0);
+                gs(false);gs(true,0);
+                gs(false);gs(true,0);
+                ps(true,gashiSize*6,gashiSize*4);
+                gs(false);gs(true,0);
+                gs(false);gs(true,0);
+                gs(false);gs(true,0);
+                gs(false);gs(true,0);
+                gs(false);gs(true,0);
+                gs(false);gs(true,0);
+                gs(false);gs(false);gs(false);
+                break;
+
+            case 9:
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(true);gs(true);gs(true);gs(true);
+                ps(false,gashiSize*10,gashiSize*4);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(false,0,0);
+                gs(true,0);
+                gs(false);
+                gs(false,0,0);
+                gs(true,0);
+                gs(false);
+                gs(true,0);
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(false);
+                break;
+
+           case 0:
                 hps(true, 0, gashiSize*10); ps(false, 0, gashiSize*10); hps(true, gashiSize*10, gashiSize*10); ps(false, gashiSize*6, gashiSize*8); hps(true, gashiSize*4, gashiSize*10); ps(false, gashiSize*9, gashiSize*8); hps(true, gashiSize, gashiSize*10); ps(false, gashiSize*7, gashiSize*5); hps(true, gashiSize*3, gashiSize*10); ps(false, gashiSize*6, gashiSize*10); hps(true, gashiSize*4, gashiSize*10); ps(false, gashiSize*6, gashiSize*5); hps(true, gashiSize*4, gashiSize*10); ps(false, gashiSize*6, gashiSize*8); hps(true, gashiSize*4, gashiSize*10); ps(false, gashiSize*8, gashiSize*3); hps(true, gashiSize*2, gashiSize);
                 gs(false, 0); gs(true, 0); hDown(true,0);hUp(true,0);   for(int i = 0; i < 6; i++){gs(false); gs(true,0);hDown(true,0); hUp(true,0);} for(int i = 0; i < 3; i++){gs(false); gs(false,0,0);gs(true,0);hDown(true,0); hUp(true,0);}
                 for(int i = 0; i < 6; i++){hDown(true,gashiSize); hUp(true,0);} for(int i = 0; i < 4; i++){gs(false,gashiSize,0);hDown(true,0);hUp(true,0);gs(false,gashiSize,1);hDown(true,0);hUp(true,0);}
@@ -1241,33 +1446,33 @@ public class Choice extends AppCompatActivity {
                 for(int i = 0; i < 10; i++){hDown(true, gashiSize); gs(true,0);hUp(true, 0); gs(false,0);} for(int i = 0; i < 5; i++){gs(false);hUp(true,0);} gs(false); hUp(true,0); gs(false); hUp(true,0);gs(false,0,0);gs(false);hUp(true,0);gs(false,0,0);
                 for(int i = 0; i < 4; i++){hUp(true,gashiSize);gs(false,0);hDown(true,0);} for(int i = 0; i < 3; i++){hUp(true,gashiSize);hDown(true,0);gs(false,0,0);gs(false,0,1);}
                 break;
-            case 8: //반 점 점 점 반점
+            case 4: //반 점 점 점 반점
                 hps(true, 0, gashiSize*10); hps(true,gashiSize*10,gashiSize*10); hps(true,gashiSize*10,gashiSize*10); ps(false, gashiSize*5, gashiSize*5);
                 gs(false,0); hDown(true, 0); hUp(true, 0); for(int i = 0; i < 3; i ++){gss(false, 3); gs(true,0); gss(false, 3); hDown(true,0);}
                 gs(true, gashiSize*5); gs(false); hDown(true,0);gs(true);gs(false,0,1);gs(false);hDown(true,0);gs(true);gs(false,0,1); gs(false); hDown(true,0);gs(true);gs(false,0,1);
                 break;
-            case 7: //반 반~ 반~ 반~ 반~ 반~ 반~ 반 반 반
+            case 10: //반 반~ 반~ 반~ 반~ 반~ 반~ 반 반 반
                 ps(true,0,gashiSize); ps(false,0,gashiSize);
                 for(int i = 0; i < 15; i++){ps(true, gashiSize*4, gashiSize); ps(false, 0, gashiSize);}
                 for(int i = 0; i < 3; i++){gs(false,0,0);gs(false,0,1);gs(true,0,0); gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(true,0,0);gs(true,0,1);gs(false,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0);} gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0);gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0);
                 break;
-            case 6: //반점 점 점 반점 반or점반
+            case 11: //반점 점 점 반점 반or점반
                 ps(true, gashiSize, gashiSize*10); ps(true, gashiSize*10, gashiSize*2); ps(true, gashiSize*2, gashiSize*6); ps(false, gashiSize*10, gashiSize*3); ps(false, gashiSize*9, gashiSize*5); ps(true, gashiSize*7, gashiSize*4);
                 gs(false,0); gs(true,0); gs(false);gs(true,0);gs(false);gs(true,0);gs(false, 0); gs(true,0); gs(false); gs(true, 0); gs(false); gs(true, 0); for(int i = 0; i < 3; i++){gs(false); gs(true,0); gs(true,0,0);} for(int i = 0; i < 4; i++){gs(false); gs(true, 0);} for(int i = 0; i < 3; i++){gs(false); gs(true,0); gs(true,0,0);} for(int i = 0; i < 3; i++){gs(false); gs(true, 0);} gs(true);
                 gs(false,0); for(int i = 0; i < 7; i++) {gs(false); gs(true,0);}; gs(false,gashiSize*9); gs(false); gs(false,0,0);gs(false);gs(false,0,0); gss(false,2); for(int i = 0; i < 4; i++){gs(false); gs(true,0,0);}
                 break;
-            case 1: //반점 점 점 반
+            case 12: //반점 점 점 반
                 ps(false, gashiSize, gashiSize*10); ps(false, gashiSize*10, gashiSize*2); ps(false, gashiSize*2, gashiSize*6); ps(true, gashiSize*10, gashiSize*3);
                 gs(true,0); gs(false,0); gs(true);gs(false,0);gs(true);gs(false,0);gs(true, 0); gs(false,0); gs(true); gs(false, 0); gs(true); gs(false, 0); for(int i = 0; i < 3; i++){gs(true); gs(false,0); gs(false,0,0);} for(int i = 0; i < 4; i++){gs(true); gs(false, 0);} for(int i = 0; i < 3; i++){gs(true); gs(false,0); gs(false,0,0);} for(int i = 0; i < 3; i++){gs(true); gs(false, 0);} gs(false);
                 gss(false, 5); gs(true,0,0); gs(false);gs(true,0,0); gs(false); gs(true,0,0); gs(false);
                 break;
-            case 2: //가점 가점 반가점 반점
+            case 13: //가점 가점 반가점 반점
                 hps(false, 0, gashiSize*10); hps(true, 0, gashiSize*10); hps(false, gashiSize*10, gashiSize*10); hps(true, 0, gashiSize*10); hps(false, gashiSize*10, gashiSize*10); hps(true, 0, gashiSize*10); hps(true, gashiSize*10, gashiSize*3); hps(false, 0, gashiSize*3);
                 hUp(false, 0); hDown(false, 0); hUp(true, 0); hDown(true, 0);
                 gs(true); hDown(true,gashiSize); gs(true); hDown(true,gashiSize); gs(false, 0);  gs(true); hDown(true, gashiSize);  gs(true); hDown(false, 0); hDown(true, gashiSize); gs(true); hDown(true,gashiSize); gs(true); gs(false, 0);
                 gs(false, gashiSize*8); hDown(false, gashiSize); gs(true, 0);  gs(false); hDown(false, gashiSize);  gs(false); hDown(true, 0); hDown(false, gashiSize); hDown(true, gashiSize); hDown(true, gashiSize*2); hDown(true, gashiSize*2); gs(true, 0); gs(false, 0);
                 break;
-            case 3: //반점 반점 반점 점 점 반점
+            case 14: //반점 반점 반점 점 점 반점
                 ps(false, 0,gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(true, gashiSize*9, gashiSize*2);
                 gs(false, 0, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
                 gs(true, gashiSize*8, 0); gs(true, 0, 1); gs(false, 0); gs(false); gs(true, 0, 0); gs(true, 0, 1);
@@ -1277,7 +1482,7 @@ public class Choice extends AppCompatActivity {
                 gs(true, gashiSize*8, 0); gs(true, 0, 1); gs(false, 0); gs(false); gs(true, 0, 0); gs(true, 0, 1);
 
                 break;
-            case 4: //가만히 반 점 반 반 반점 반점
+            case 15: //가만히 반 점 반 반 반점 반점
                 ps(true, 0, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, 0, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2);
                 gs(true, 0, 0); gs(true, 0, 1); gs(false, 0, 0); gs(false, gashiSize, 0); gs(true, 0, 0); gs(true, 0, 1);
                 gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0, 0); gs(true, gashiSize, 0); gs(false, 0, 0); gs(false, 0, 1);
@@ -1289,7 +1494,7 @@ public class Choice extends AppCompatActivity {
 
 
                 break;
-            case 5: //점프.. 반전.. 반전.. 점프
+            case 16: //점프.. 반전.. 반전.. 점프
                 ps(false, 0, gashiSize*10); ps(true, 0, gashiSize*2); ps(false, gashiSize*10, gashiSize*2);
                 gs(false, 0, 1); gs(true, 0, 1); gs(true, 0, 0); gs(true, gashiSize, 1); gs(true, 0, 0);
                 gs(false, gashiSize*6, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, 0, 1);
@@ -1297,7 +1502,7 @@ public class Choice extends AppCompatActivity {
 
                 break;
 
-            case 9:
+            case 17:
                 gs(false, 0); gs(true, 0); gs(true, 0, 0);
                 gs(false); gs(true, 0); gs(true, 0, 0);
                 gs(false); gs(true, 0); gs(true, 0, 0);
@@ -1330,7 +1535,7 @@ public class Choice extends AppCompatActivity {
                 }
                 //ps(true, 10000, 100);
                 break;
-            case 99:
+            case 18:
                 for(int i=0; i<12; i++){
                     gs(false);
                     gs(true, 0);
@@ -1354,7 +1559,7 @@ public class Choice extends AppCompatActivity {
                 ps(true, 0, gashiSize*2);
                 break;
 
-            case 100:
+            case 19:
                 for(int i=0; i<12; i++){
                     gs(false);
                     gs(true, 0);
