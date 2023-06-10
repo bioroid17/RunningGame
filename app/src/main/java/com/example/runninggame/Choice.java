@@ -98,7 +98,7 @@ public class Choice extends AppCompatActivity {
     boolean jumpPress = false;
 
     int jumphei = platY * 2; //최대 점프 높이
-    float gameSpeed = 0.7f;
+    float gameSpeed = 1f;
     float B = 15f/gameSpeed; //공중정지까지 걸리는 시간. 게임속도와 반비례
     float A = 2 * jumphei / B;; //시작 속력
 
@@ -467,6 +467,7 @@ public class Choice extends AppCompatActivity {
         ground.setImageResource(R.drawable.player);
         ((ViewGroup)findViewById(android.R.id.content)).addView(ground);
         ground.getLayoutParams().height = (int)(playerSize * 0.5f);
+        ground.getLayoutParams().width = screenWidth*2;
         ground.setScaleType(ImageView.ScaleType.FIT_XY);
 
         groundRect = new RectF(ground.getLeft(), ground.getTop(), ground.getRight(), ground.getBottom());
@@ -709,7 +710,7 @@ public class Choice extends AppCompatActivity {
         player.setY(groundY - ground.getHeight()/2f - player.getHeight());
         isreversal = false;
         speedUpCount = -1;
-        gameSpeed = 0.7f;
+        gameSpeed = 1f;
         gameSpeedChange(0);
         translateY = 0;
 
@@ -979,7 +980,7 @@ public class Choice extends AppCompatActivity {
     private void createEff(){
         RunningEffect runEff = new RunningEffect();
         runEff.eff = new ImageView(this);
-        runEff.eff.setImageResource(R.drawable.gashi);
+        runEff.eff.setImageResource(R.drawable.running_eff);
         runEff.eff.setScaleType(ImageView.ScaleType.FIT_XY);
         runEff.eff.setLayoutParams(new ViewGroup.LayoutParams(effSize, effSize));
         Random random = new Random();
