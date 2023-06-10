@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
     }
 
     @Override
@@ -66,14 +65,13 @@ public class MainActivity extends AppCompatActivity {
             ImageView snowflake = new ImageView(MainActivity.this);
             snowflake.setImageResource(R.drawable.snowflake_image2); //눈이미지 변경
             rootView.addView(snowflake);
-
             animateSnowflake(snowflake);
         }
 
-        TextView scoreText = findViewById(R.id.Score);
         TextView firstScore= findViewById(R.id.firstscore);
-        firstScore.setText("Top: " + firstscore); // 텍스트 변경
-        scoreText.setOnClickListener(new View.OnClickListener() {
+        firstScore.setText("High Score \n" + firstscore);  // 텍스트 변경
+        firstScore.setTextSize(50);
+        firstScore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
@@ -85,18 +83,15 @@ public class MainActivity extends AppCompatActivity {
         // TextView 객체를 참조합니다.
         TextView textView = findViewById(R.id.my_text_view);
         textView.setAlpha(0);
-        scoreText.setAlpha(0);
         firstScore.setAlpha(0);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 textView.setAlpha(1);
-                scoreText.setAlpha(1);
                 firstScore.setAlpha(1);
                 Animation animation = new TranslateAnimation(0, 0, -100, 0);
                 animation.setDuration(700);
 
-                scoreText.startAnimation(animation);
                 firstScore.startAnimation(animation);
                 textView.startAnimation(animation);
             }
@@ -185,8 +180,7 @@ public class MainActivity extends AppCompatActivity {
 
         int endX = -snowflake.getWidth(); // 왼쪽 끝으로 이동
         int endY = random.nextInt(screenHeight);
-
-        int duration = random.nextInt(5000) + 4000; // 4000ms부터 8000 사이의 랜덤한 시간 (2초부터 5초)
+        int duration = random.nextInt(3000) + 4000; // 속도 조절
 
         ObjectAnimator animatorX = ObjectAnimator.ofFloat(snowflake, "translationX", startX, endX);
         ObjectAnimator animatorY = ObjectAnimator.ofFloat(snowflake, "translationY", startY, endY);

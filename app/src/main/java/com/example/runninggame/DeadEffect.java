@@ -31,7 +31,7 @@ public class DeadEffect {
                 deadEff.getLayoutParams().width = curSize;
                 deadEff.getLayoutParams().height = curSize;
                 deadEff.setLayoutParams(deadEff.getLayoutParams());
-                Log.d("jeje", curSize+"");
+//                Log.d("jeje", curSize+"");
                 curSize -= 3 * objectSpeed/20;
 
                 gamehandler.postDelayed(this, 1);

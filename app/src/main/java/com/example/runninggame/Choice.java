@@ -563,7 +563,7 @@ public class Choice extends AppCompatActivity {
         ((ViewGroup)findViewById(android.R.id.content)).addView(resumeButton);
 
         View view = findViewById(R.id.deltaRelative);
-       view.setOnTouchListener(new View.OnTouchListener() {
+        view.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event){
                 int screenWidth = v.getWidth();
                 int screenHeight = v.getHeight();
@@ -1291,9 +1291,9 @@ public class Choice extends AppCompatActivity {
                 break;
             case 5: //점프.. 반전.. 반전.. 점프
                 ps(false, 0, gashiSize*10); ps(true, 0, gashiSize*2); ps(false, gashiSize*10, gashiSize*2);
-                 gs(false, 0, 1); gs(true, 0, 1); gs(true, 0, 0); gs(true, gashiSize, 1); gs(true, 0, 0);
-                 gs(false, gashiSize*6, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, 0, 1);
-                 gs(true, gashiSize*5); gss(true,5); gs(false,0); gs(false);gs(true,0);gs(true);gs(false,0);
+                gs(false, 0, 1); gs(true, 0, 1); gs(true, 0, 0); gs(true, gashiSize, 1); gs(true, 0, 0);
+                gs(false, gashiSize*6, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, 0, 1);
+                gs(true, gashiSize*5); gss(true,5); gs(false,0); gs(false);gs(true,0);gs(true);gs(false,0);
 
                 break;
 
@@ -1381,4 +1381,3 @@ public class Choice extends AppCompatActivity {
         }
     }
 }//좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.
-

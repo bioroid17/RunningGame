@@ -5,6 +5,7 @@ import static android.R.layout.simple_list_item_1;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -25,6 +26,12 @@ import java.util.List;
 public class ScoreActivity extends Activity {
     private ScoreManager scoreManager;
     private ListView scoreListView;
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
