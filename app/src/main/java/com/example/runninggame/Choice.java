@@ -77,7 +77,7 @@ public class Choice extends AppCompatActivity {
     private int effPoolNum = 0;
 
     private List<DeadEffect> deadEffPool = new ArrayList<>();
-    private int deadEffPoolSize = 50;
+    private int deadEffPoolSize = 60;
 
 
     ////////////////
@@ -106,7 +106,9 @@ public class Choice extends AppCompatActivity {
 
     private float objectSpeed = 20 * gameSpeed; //가시와 발판 스피드
 
-    int patternSize = 0;
+    int patternSize = 0; //패턴이 총 몇개 있는지가 자동으로 설정됨
+    int patternCount = 0; //현재가 몇번째로 나오는 패턴인지
+    private List<Boolean> isPatternOut = new ArrayList<>();
     int previousPattern = 999999;
 
 
@@ -176,6 +178,101 @@ public class Choice extends AppCompatActivity {
             }
 
             gamehandler.postDelayed(this, 10);
+        }
+    };
+
+    private float quakeCurPower;
+    private final float quakePower = 40;
+    private float quakeX, quakeY;
+    private Handler quakeHandler = new Handler();
+    private Runnable quakeRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(quakePower != quakeCurPower) {
+                ground.setX(ground.getX() - quakeX); ground.setY(ground.getY() - quakeY);
+                if(gashiPoolStart < gashiPoolEnd) {
+                    for(int i = gashiPoolStart; i < gashiPoolEnd; i++){
+                        gashiPool.get(i).setX(gashiPool.get(i).getX() -quakeX);
+                        gashiPool.get(i).setY(gashiPool.get(i).getY() -quakeY);
+                    }
+                } else if(gashiPoolStart > gashiPoolEnd){
+                    for(int i = gashiPoolStart; i < gashiPoolSize; i++) {
+                        gashiPool.get(i).setX(gashiPool.get(i).getX() -quakeX);
+                        gashiPool.get(i).setY(gashiPool.get(i).getY() -quakeY);
+                    }
+                    for(int i = 0; i < gashiPoolEnd; i++){
+                        gashiPool.get(i).setX(gashiPool.get(i).getX() -quakeX);
+                        gashiPool.get(i).setY(gashiPool.get(i).getY() -quakeY);
+                    }
+                }
+                for(int j = 0; j < 10; j++) {
+                    if (platPoolStart[j] < platPoolEnd[j]) {
+                        for (int i = platPoolStart[j]; i < platPoolEnd[j]; i++) {
+                            platPool.get(j).get(i).setX(platPool.get(j).get(i).getX() -quakeX);
+                            platPool.get(j).get(i).setY(platPool.get(j).get(i).getY() -quakeY);
+                        }
+                    } else if (platPoolStart[j] > platPoolEnd[j]) {
+                        for (int i = platPoolStart[j]; i < platPoolSize; i++) {
+                            platPool.get(j).get(i).setX(platPool.get(j).get(i).getX() -quakeX);
+                            platPool.get(j).get(i).setY(platPool.get(j).get(i).getY() -quakeY);
+                        }
+                        for (int i = 0; i < platPoolEnd[j]; i++) {
+                            platPool.get(j).get(i).setX(platPool.get(j).get(i).getX() -quakeX);
+                            platPool.get(j).get(i).setY(platPool.get(j).get(i).getY() -quakeY);
+                        }
+                    }
+                }
+            } //위치 전부 움직인거의 마이너스로
+            boolean randomX = random.nextBoolean();
+            boolean randomY = random.nextBoolean();
+            if(randomX) quakeX = quakeCurPower; else quakeX = -quakeCurPower;
+            if(randomY) quakeY = quakeCurPower; else quakeY = -quakeCurPower;
+            quakeCurPower -= gameSpeed;
+            if(quakeCurPower <= 0) {quakeCurPower = 0; quakeX = 0; quakeY = 0;}
+            ground.setX(ground.getX()+quakeX); ground.setY(ground.getY()+quakeY);
+            if(gashiPoolStart < gashiPoolEnd) {
+                for(int i = gashiPoolStart; i < gashiPoolEnd; i++){
+                    gashiPool.get(i).setX(gashiPool.get(i).getX() + quakeX);
+                    gashiPool.get(i).setY(gashiPool.get(i).getY() + quakeY);
+                }
+            } else if(gashiPoolStart > gashiPoolEnd){
+                for(int i = gashiPoolStart; i < gashiPoolSize; i++) {
+                    gashiPool.get(i).setX(gashiPool.get(i).getX() + quakeX);
+                    gashiPool.get(i).setY(gashiPool.get(i).getY() + quakeY);
+                }
+                for(int i = 0; i < gashiPoolEnd; i++){
+                    gashiPool.get(i).setX(gashiPool.get(i).getX() + quakeX);
+                    gashiPool.get(i).setY(gashiPool.get(i).getY() + quakeY);
+                }
+            }
+            for(int j = 0; j < 10; j++) {
+                if (platPoolStart[j] < platPoolEnd[j]) {
+                    for (int i = platPoolStart[j]; i < platPoolEnd[j]; i++) {
+                        platPool.get(j).get(i).setX(platPool.get(j).get(i).getX() +quakeX);
+                        platPool.get(j).get(i).setY(platPool.get(j).get(i).getY() +quakeY);
+                    }
+                } else if (platPoolStart[j] > platPoolEnd[j]) {
+                    for (int i = platPoolStart[j]; i < platPoolSize; i++) {
+                        platPool.get(j).get(i).setX(platPool.get(j).get(i).getX() +quakeX);
+                        platPool.get(j).get(i).setY(platPool.get(j).get(i).getY() +quakeY);
+                    }
+                    for (int i = 0; i < platPoolEnd[j]; i++) {
+                        platPool.get(j).get(i).setX(platPool.get(j).get(i).getX() +quakeX);
+                        platPool.get(j).get(i).setY(platPool.get(j).get(i).getY() +quakeY);
+                    }
+                }
+            }
+
+            if(quakeCurPower != 0)
+                gamehandler.postDelayed(this, 10);
+            else{
+                menuview.setVisibility(View.VISIBLE);
+                restartButton.setVisibility(View.VISIBLE);
+                restartTextView.setVisibility(View.VISIBLE);
+                scoreTextView.setVisibility(View.VISIBLE);
+                mainmenuButton.setVisibility(View.VISIBLE);
+                mainmenuTextView.setVisibility(View.VISIBLE);
+            }
         }
     };
 
@@ -333,6 +430,9 @@ public class Choice extends AppCompatActivity {
             patternSize++;
         } while(!gY.isEmpty() || !pMY.isEmpty());
         patternSize -= 2;
+        for(int i = 0; i <= patternSize; i++){
+            isPatternOut.add(new Boolean(false));
+        }
 
 
 
@@ -560,8 +660,9 @@ public class Choice extends AppCompatActivity {
             public void run() {
                 int screenHeight = getResources().getDisplayMetrics().heightPixels;
                 ground.setY(screenHeight / 2 - ground.getHeight());
+                ground.setX(ground.getX()-100);
                 int screenWidth = getResources().getDisplayMetrics().widthPixels;
-                ground.getLayoutParams().width = screenWidth;
+                ground.getLayoutParams().width = screenWidth*2;
                 groundY = ground.getY() + ground.getHeight() / 2f; //땅 Y값의 중간값
                 player.setX(200); //플레이어 시작위치
                 player.setY(groundY - ground.getHeight()/2f - player.getHeight());
@@ -775,14 +876,17 @@ public class Choice extends AppCompatActivity {
                     scoreManager.saveScore(score);
                     pauseButton.setVisibility(View.INVISIBLE);
                     isDead = true;
-                    menuview.setVisibility(View.VISIBLE);
+                    quakeCurPower = quakePower;
+                    quakeHandler.post(quakeRunnable);
                     speedUpText.setVisibility(View.INVISIBLE);
+                    /*
+                    menuview.setVisibility(View.VISIBLE);
                     restartButton.setVisibility(View.VISIBLE);
                     restartTextView.setVisibility(View.VISIBLE);
                     scoreTextView.setVisibility(View.VISIBLE);
                     mainmenuButton.setVisibility(View.VISIBLE);
                     mainmenuTextView.setVisibility(View.VISIBLE);
-
+*/
                     player.setVisibility(View.INVISIBLE);
                     spawnDeadEff();
                 }
@@ -836,10 +940,14 @@ public class Choice extends AppCompatActivity {
                 gameSpeedChange(0.03f);
                 return true;
             }
-            if(keyCode == KeyEvent.KEYCODE_R){
-                spawnEff();
-                return true;
-            }
+        }
+        if(keyCode == KeyEvent.KEYCODE_R){
+            onRestartButtonClick(restartTextView);
+            return true;
+        }
+        if(keyCode == KeyEvent.KEYCODE_S){
+            quakeCurPower = quakePower;
+            quakeHandler.post(quakeRunnable);
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -1076,9 +1184,16 @@ public class Choice extends AppCompatActivity {
     }
 
     private void pattern(){
-        do {
+        /*do {
             patternNum = patternDrawing(0, patternSize);
-        } while(patternNum == previousPattern);
+        } while(patternNum == previousPattern);*/
+        do{
+            patternNum = patternDrawing(0, patternSize);
+        } while(isPatternOut.get(patternNum) == true); //이전에 나온 패턴이 아닐 경우에만 통과
+        patternCount++;
+        isPatternOut.set(patternNum, true);
+        if(patternCount > patternSize) {patternCount = 0; for(int i = 0; i <= patternSize; i++) {isPatternOut.set(i, false);}}
+        //patternNum = 0;
         SelectPattern(patternNum);
         previousPattern = patternNum;
         SpawnObj();
@@ -1097,30 +1212,97 @@ public class Choice extends AppCompatActivity {
         }
     }
 
-
+    private void gss(boolean re, int j){
+        for(int i = 0; i < j; i++){
+            gs(re);
+        }
+    }
+    private void hDown(boolean re, int d){ //높은 플랫폼 아래에 생성
+        gs(re, d, (int)(platY*2-gashiSize), true);
+    }
+    private void hUp(boolean re, int d){ //높은 플랫폼 위에 생성
+        gs(re, d, (int)(platY*2+platSize), false);
+    }
+    private void hps(boolean re, int d, int l){
+        ps(re, d, l, (int)(platY*2));
+    }
 
 
     public void SelectPattern(int select){ //여기에 패턴 만들고 패턴번호 붙이면 됨 사용은 maptemp에서 stagelevel list에 add(패턴숫자)하면 됨
 //        gs() 위/아래 , 거리 , 공중
         switch (select){
+
             case 0:
-                gs(true);
-                gs(false);
-                gs(true, 200);
-                gs(false, 0);
-                gs(false, 300, 0);
-                gs(true, 200, 1);
-                ps(false, 100, gashiSize);
-                ps(false, gashiSize*2+400, gashiSize);
-                ps(true, 200, gashiSize);
+                hps(true, 0, gashiSize*10); ps(false, 0, gashiSize*10); hps(true, gashiSize*10, gashiSize*10); ps(false, gashiSize*6, gashiSize*8); hps(true, gashiSize*4, gashiSize*10); ps(false, gashiSize*9, gashiSize*8); hps(true, gashiSize, gashiSize*10); ps(false, gashiSize*7, gashiSize*5); hps(true, gashiSize*3, gashiSize*10); ps(false, gashiSize*6, gashiSize*10); hps(true, gashiSize*4, gashiSize*10); ps(false, gashiSize*6, gashiSize*5); hps(true, gashiSize*4, gashiSize*10); ps(false, gashiSize*6, gashiSize*8); hps(true, gashiSize*4, gashiSize*10); ps(false, gashiSize*8, gashiSize*3); hps(true, gashiSize*2, gashiSize);
+                gs(false, 0); gs(true, 0); hDown(true,0);hUp(true,0);   for(int i = 0; i < 6; i++){gs(false); gs(true,0);hDown(true,0); hUp(true,0);} for(int i = 0; i < 3; i++){gs(false); gs(false,0,0);gs(true,0);hDown(true,0); hUp(true,0);}
+                for(int i = 0; i < 6; i++){hDown(true,gashiSize); hUp(true,0);} for(int i = 0; i < 4; i++){gs(false,gashiSize,0);hDown(true,0);hUp(true,0);gs(false,gashiSize,1);hDown(true,0);hUp(true,0);}
+                for(int i = 0; i < 5; i++){hDown(true, gashiSize);hUp(true, 0);}
+                for(int i = 0; i < 5; i++){hDown(true, gashiSize); gs(true,0);hUp(true, 0); gs(false,0);} for(int i = 0; i < 3; i++){gs(true);hUp(true,0);hDown(true,0);gs(false,0,0);gs(false,0,1);} for(int i = 0; i < 16; i++){gs(true); hUp(true,0);hDown(true,0);gs(false,0);}for(int i = 0; i < 3; i++){gs(true);hUp(true,0);hDown(true,0);gs(false,0,0);gs(false,0,1);}
+                for(int i = 0; i < 10; i++){hDown(true, gashiSize); gs(true,0);hUp(true, 0); gs(false,0);} for(int i = 0; i < 5; i++){gs(false);hUp(true,0);} gs(false); hUp(true,0); gs(false); hUp(true,0);gs(false,0,0);gs(false);hUp(true,0);gs(false,0,0);
+                for(int i = 0; i < 4; i++){hUp(true,gashiSize);gs(false,0);hDown(true,0);} for(int i = 0; i < 3; i++){hUp(true,gashiSize);hDown(true,0);gs(false,0,0);gs(false,0,1);}
+                break;
+            case 8: //반 점 점 점 반점
+                hps(true, 0, gashiSize*10); hps(true,gashiSize*10,gashiSize*10); hps(true,gashiSize*10,gashiSize*10); ps(false, gashiSize*5, gashiSize*5);
+                gs(false,0); hDown(true, 0); hUp(true, 0); for(int i = 0; i < 3; i ++){gss(false, 3); gs(true,0); gss(false, 3); hDown(true,0);}
+                gs(true, gashiSize*5); gs(false); hDown(true,0);gs(true);gs(false,0,1);gs(false);hDown(true,0);gs(true);gs(false,0,1); gs(false); hDown(true,0);gs(true);gs(false,0,1);
+                break;
+            case 7: //반 반~ 반~ 반~ 반~ 반~ 반~ 반 반 반
+                ps(true,0,gashiSize); ps(false,0,gashiSize);
+                for(int i = 0; i < 15; i++){ps(true, gashiSize*4, gashiSize); ps(false, 0, gashiSize);}
+                for(int i = 0; i < 3; i++){gs(false,0,0);gs(false,0,1);gs(true,0,0); gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(true,0,0);gs(true,0,1);gs(false,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0);} gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0);gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0);
+                break;
+            case 6: //반점 점 점 반점 반or점반
+                ps(true, gashiSize, gashiSize*10); ps(true, gashiSize*10, gashiSize*2); ps(true, gashiSize*2, gashiSize*6); ps(false, gashiSize*10, gashiSize*3); ps(false, gashiSize*9, gashiSize*5); ps(true, gashiSize*7, gashiSize*4);
+                gs(false,0); gs(true,0); gs(false);gs(true,0);gs(false);gs(true,0);gs(false, 0); gs(true,0); gs(false); gs(true, 0); gs(false); gs(true, 0); for(int i = 0; i < 3; i++){gs(false); gs(true,0); gs(true,0,0);} for(int i = 0; i < 4; i++){gs(false); gs(true, 0);} for(int i = 0; i < 3; i++){gs(false); gs(true,0); gs(true,0,0);} for(int i = 0; i < 3; i++){gs(false); gs(true, 0);} gs(true);
+                gs(false,0); for(int i = 0; i < 7; i++) {gs(false); gs(true,0);}; gs(false,gashiSize*9); gs(false); gs(false,0,0);gs(false);gs(false,0,0); gss(false,2); for(int i = 0; i < 4; i++){gs(false); gs(true,0,0);}
+                break;
+            case 1: //반점 점 점 반
+                ps(false, gashiSize, gashiSize*10); ps(false, gashiSize*10, gashiSize*2); ps(false, gashiSize*2, gashiSize*6); ps(true, gashiSize*10, gashiSize*3);
+                gs(true,0); gs(false,0); gs(true);gs(false,0);gs(true);gs(false,0);gs(true, 0); gs(false,0); gs(true); gs(false, 0); gs(true); gs(false, 0); for(int i = 0; i < 3; i++){gs(true); gs(false,0); gs(false,0,0);} for(int i = 0; i < 4; i++){gs(true); gs(false, 0);} for(int i = 0; i < 3; i++){gs(true); gs(false,0); gs(false,0,0);} for(int i = 0; i < 3; i++){gs(true); gs(false, 0);} gs(false);
+                gss(false, 5); gs(true,0,0); gs(false);gs(true,0,0); gs(false); gs(true,0,0); gs(false);
+                break;
+            case 2: //가점 가점 반가점 반점
+                hps(false, 0, gashiSize*10); hps(true, 0, gashiSize*10); hps(false, gashiSize*10, gashiSize*10); hps(true, 0, gashiSize*10); hps(false, gashiSize*10, gashiSize*10); hps(true, 0, gashiSize*10); hps(true, gashiSize*10, gashiSize*3); hps(false, 0, gashiSize*3);
+                hUp(false, 0); hDown(false, 0); hUp(true, 0); hDown(true, 0);
+                gs(true); hDown(true,gashiSize); gs(true); hDown(true,gashiSize); gs(false, 0);  gs(true); hDown(true, gashiSize);  gs(true); hDown(false, 0); hDown(true, gashiSize); gs(true); hDown(true,gashiSize); gs(true); gs(false, 0);
+                gs(false, gashiSize*8); hDown(false, gashiSize); gs(true, 0);  gs(false); hDown(false, gashiSize);  gs(false); hDown(true, 0); hDown(false, gashiSize); hDown(true, gashiSize); hDown(true, gashiSize*2); hDown(true, gashiSize*2); gs(true, 0); gs(false, 0);
+                break;
+            case 3: //반점 반점 반점 점 점 반점
+                ps(false, 0,gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(true, gashiSize*9, gashiSize*2);
+                gs(false, 0, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
+                gs(true, gashiSize*8, 0); gs(true, 0, 1); gs(false, 0); gs(false); gs(true, 0, 0); gs(true, 0, 1);
+                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
+                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
+                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
+                gs(true, gashiSize*8, 0); gs(true, 0, 1); gs(false, 0); gs(false); gs(true, 0, 0); gs(true, 0, 1);
+
+                break;
+            case 4: //가만히 반 점 반 반 반점 반점
+                ps(true, 0, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, 0, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2);
+                gs(true, 0, 0); gs(true, 0, 1); gs(false, 0, 0); gs(false, gashiSize, 0); gs(true, 0, 0); gs(true, 0, 1);
+                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0, 0); gs(true, gashiSize, 0); gs(false, 0, 0); gs(false, 0, 1);
+                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
+                gs(true, gashiSize*8, 0); gs(true, 0, 1); gs(false, 0, 0); gs(false, gashiSize, 0); gs(true, 0, 0); gs(true, 0, 1);
+                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0, 0); gs(true, gashiSize, 0); gs(false, 0, 0); gs(false, 0, 1);
+                gs(true, gashiSize*8, 0); gs(true, 0, 1); gs(false, 0); gs(false); gs(true, 0, 0); gs(true, 0, 1);
+                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
+
+
+                break;
+            case 5: //점프.. 반전.. 반전.. 점프
+                ps(false, 0, gashiSize*10); ps(true, 0, gashiSize*2); ps(false, gashiSize*10, gashiSize*2);
+                 gs(false, 0, 1); gs(true, 0, 1); gs(true, 0, 0); gs(true, gashiSize, 1); gs(true, 0, 0);
+                 gs(false, gashiSize*6, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, gashiSize, 0); gs(false, 0, 1);
+                 gs(true, gashiSize*5); gss(true,5); gs(false,0); gs(false);gs(true,0);gs(true);gs(false,0);
+
                 break;
 
-            case 1:
+            case 9:
                 gs(false, 0); gs(true, 0); gs(true, 0, 0);
                 gs(false); gs(true, 0); gs(true, 0, 0);
                 gs(false); gs(true, 0); gs(true, 0, 0);
 
-                for(int j = 0; j < 10; j++) {
+                for(int j = 0; j < 3; j++) {
                     for (int i = 0; i < 5; i++) {
                         gs(false);
                         gs(true, 0);
@@ -1142,43 +1324,13 @@ public class Choice extends AppCompatActivity {
                 }
                 ps(false, 0, gashiSize*3);
                 ps(true, 0, gashiSize*3);
-                for(int i = 0; i < 20; i++){
+                for(int i = 0; i < 6; i++){
                     ps(true, 800, gashiSize*3);
                     ps(false, 0, gashiSize*3);
                 }
                 //ps(true, 10000, 100);
                 break;
-
-            case 2:
-                ps(true, 0, 1000);
-                ps(false, 0, 1000);
-
-                ps(true, 1300, 1000);
-                ps(false, 0, 1000);
-                break;
-
-            case 3:
-                // 위로 18개의 가시가 연속으로 등장
-                for(int i=0; i<18; i++)
-                    gs(false);
-                break;
-
-            case 4:
-                // 위로 4개의 가시가 연속으로 등장
-                for(int i=0; i<4; i++)
-                    gs(false);
-                // 아래로 4개의 가시가 연속으로 등장
-                for(int i=0; i<4; i++)
-                    gs(true);
-                // 위로 4개의 가시가 연속으로 등장
-                for(int i=0; i<4; i++)
-                    gs(false);
-                // 아래로 4개의 가시가 연속으로 등장
-                for(int i=0; i<4; i++)
-                    gs(true);
-                break;
-
-            case 5:
+            case 99:
                 for(int i=0; i<12; i++){
                     gs(false);
                     gs(true, 0);
@@ -1202,7 +1354,7 @@ public class Choice extends AppCompatActivity {
                 ps(true, 0, gashiSize*2);
                 break;
 
-            case 6:
+            case 100:
                 for(int i=0; i<12; i++){
                     gs(false);
                     gs(true, 0);
@@ -1226,69 +1378,6 @@ public class Choice extends AppCompatActivity {
                 ps(true, 0, gashiSize*2);
                 break;
 
-            case 7:
-                for(int i=0; i<12; i++){
-                    gs(false);
-                    gs(true, 0);
-                    if(i%3 != 2){
-                        if((i/3) % 3 == 0){
-                            gs(false, 0, gashiSize * 3 / 2, false);
-                        }
-                        else{
-                            gs(true, 0, gashiSize * 3 / 2, false);
-                        }
-                    }
-                }
-
-                ps(false, gashiSize, gashiSize*2);
-                ps(true, 0, gashiSize*2);
-                ps(false, gashiSize * 3, gashiSize*2);
-                ps(true, 0, gashiSize*2);
-                ps(false, gashiSize * 3, gashiSize*2);
-                ps(true, 0, gashiSize*2);
-                ps(false, gashiSize * 3, gashiSize*2);
-                ps(true, 0, gashiSize*2);
-                break;
-
-            case 8:
-                for(int i=0; i<12; i++){
-                    gs(false);
-                    gs(true, 0);
-                    if(i%3 != 2){
-                        if((i/3) % 3 == 0){
-                            gs(true, 0, gashiSize * 3 / 2, false);
-                        }
-                        else{
-                            gs(false, 0, gashiSize * 3 / 2, false);
-                        }
-                    }
-                }
-
-                ps(false, gashiSize, gashiSize*2);
-                ps(true, 0, gashiSize*2);
-                ps(false, gashiSize * 3, gashiSize*2);
-                ps(true, 0, gashiSize*2);
-                ps(false, gashiSize * 3, gashiSize*2);
-                ps(true, 0, gashiSize*2);
-                ps(false, gashiSize * 3, gashiSize*2);
-                ps(true, 0, gashiSize*2);
-                break;
-
-            case 999:
-                ps(false, 0, gashiSize*5);
-                ps(true, gashiSize*4, gashiSize*5);
-
-                break;
-/*
-            case 0:
-                gs(false, 0); gs(false); gs(false);
-                ps(true, 0, gashiSize*3);
-                break;
-            case 1:
-                gs(false, 0); gs(false); gs(false);
-                ps(true, 0, gashiSize*3);
-                break;
-*/
         }
     }
 }//좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.
