@@ -1304,42 +1304,6 @@ public class Choice extends AppCompatActivity {
                 gs(true,0);
                 gs(true);
                 break;
-            case 20:
-                gs(true);
-                gs(true);
-                gs(true);
-                gs(true);
-                gs(true);
-                gs(true);
-                gs(false,0);
-                gs(true);
-                gs(false,0);
-                gs(true);
-                gs(false,0);
-                ps(false,gashiSize*7,gashiSize*4);
-                gs(true);
-                gs(false,0);
-                gs(true);
-                gs(false,0);
-                gs(true);
-                gs(false,0);
-                gs(true);
-                gs(false,0);
-                gs(true);
-                gs(true);
-                gs(true);
-                ps(false,gashiSize*8,gashiSize*4,gashiSize*2+20);
-                gs(false,0,gashiSize*2+50,false);
-                gs(true);
-                gs(false,0,gashiSize*2+50,false);
-                gs(true);
-                gs(false,0);
-                gs(false,0,gashiSize*2+50,false);
-                gs(true);
-                gs(false,0);
-                gs(false,0,gashiSize*2+50,false);
-                gs(true);
-                break;
             case 5:
                 gs(false);
                 gs(false);
@@ -1617,6 +1581,43 @@ public class Choice extends AppCompatActivity {
                 ps(true, 0, gashiSize*2);
                 ps(false, gashiSize * 3, gashiSize*2);
                 ps(true, 0, gashiSize*2);
+                break;
+
+            case 20:
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(false,0);
+                gs(true);
+                gs(false,0);
+                gs(true);
+                gs(false,0);
+                ps(false,gashiSize*7,gashiSize*4);
+                gs(true);
+                gs(false,0);
+                gs(true);
+                gs(false,0);
+                gs(true);
+                gs(false,0);
+                gs(true);
+                gs(false,0);
+                gs(true);
+                gs(true);
+                gs(true);
+                ps(false,gashiSize*8,gashiSize*4,gashiSize*2+20);
+                gs(false,0,gashiSize*2+50,false);
+                gs(true);
+                gs(false,0,gashiSize*2+50,false);
+                gs(true);
+                gs(false,0);
+                gs(false,0,gashiSize*2+50,false);
+                gs(true);
+                gs(false,0);
+                gs(false,0,gashiSize*2+50,false);
+                gs(true);
                 break;
 
         }
