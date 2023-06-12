@@ -4,6 +4,8 @@ import static com.example.runninggame.maptemp.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Paint;
+import android.util.TypedValue;
 import android.media.MediaPlayer;
 import android.view.MotionEvent;
 import android.animation.Animator;
@@ -23,6 +25,8 @@ import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -44,6 +48,7 @@ public class Choice extends AppCompatActivity {
     private Timer timer;
     private View menuview;
     private TextView scoreTextView;
+//    private TextView countdownTextView;
     private TextView restartTextView;
     private  TextView mainmenuTextView;
     private  TextView resumeTextView;
@@ -534,74 +539,90 @@ public class Choice extends AppCompatActivity {
 
         menuview = new View(this);
         menuview.setVisibility(View.INVISIBLE);
-        menuview.setBackgroundColor(Color.GRAY);
-        menuview.setLayoutParams(new ViewGroup.LayoutParams(screenWidth*11/16, screenHeight*11/16));
-        menuview.setX(screenWidth*5/32);
-        menuview.setY(screenHeight*5/32);
+        menuview.setBackgroundResource(R.drawable.menu);
+        menuview.setLayoutParams(new ViewGroup.LayoutParams(screenWidth, screenHeight));
         ((ViewGroup)findViewById(android.R.id.content)).addView(menuview);
+
+        final int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 30, getResources().getDisplayMetrics());
+        final int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 40, getResources().getDisplayMetrics());
 
         restartTextView = new TextView(this);
         restartTextView.setVisibility(View.INVISIBLE);
-        restartTextView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        restartTextView.setLayoutParams(new ViewGroup.LayoutParams(width*4, height));
         restartTextView.setGravity(View.TEXT_ALIGNMENT_CENTER);
         restartTextView.setTextColor(Color.WHITE);
-        restartTextView.setTextSize(30);
+        restartTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
         restartTextView.setBackgroundColor(Color.TRANSPARENT);
-        restartTextView.setX(screenWidth*9/32);
-        restartTextView.setY(screenHeight/4);
-        restartTextView.setText("다시 시작");
+        restartTextView.setX(screenWidth/2 - width*5);
+        restartTextView.setY(screenHeight*5/16);
+        restartTextView.setText("처음부터");
+        restartTextView.setPaintFlags(restartTextView.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
         ((ViewGroup)findViewById(android.R.id.content)).addView(restartTextView);
 
         restartButton = new ImageButton(this);
         restartButton.setVisibility(View.INVISIBLE);
-        restartButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        restartButton.setX(screenWidth*5/16);
+        restartButton.setLayoutParams(new ViewGroup.LayoutParams(width*2, height*2));
+        restartButton.setX(screenWidth/2 - width*4);
         restartButton.setY(screenHeight/2);
-        restartButton.setImageResource(android.R.drawable.stat_notify_sync);
+        restartButton.setImageResource(R.drawable.restart);
         restartButton.setOnClickListener(v -> onRestartButtonClick(v));
         ((ViewGroup)findViewById(android.R.id.content)).addView(restartButton);
 
         mainmenuTextView = new TextView(this);
         mainmenuTextView.setVisibility(View.INVISIBLE);
-        mainmenuTextView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        mainmenuTextView.setLayoutParams(new ViewGroup.LayoutParams(width*4, height));
         mainmenuTextView.setGravity(View.TEXT_ALIGNMENT_CENTER);
         mainmenuTextView.setTextColor(Color.WHITE);
-        mainmenuTextView.setTextSize(30);
+        mainmenuTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
         mainmenuTextView.setBackgroundColor(Color.TRANSPARENT);
-        mainmenuTextView.setX(screenWidth*17/32);
-        mainmenuTextView.setY(screenHeight/4);
+        mainmenuTextView.setX(screenWidth/2 + width*2);
+        mainmenuTextView.setY(screenHeight*5/16);
         mainmenuTextView.setText("메인으로");
+        mainmenuTextView.setPaintFlags(mainmenuTextView.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
         ((ViewGroup)findViewById(android.R.id.content)).addView(mainmenuTextView);
 
         mainmenuButton = new ImageButton(this);
         mainmenuButton.setVisibility(View.INVISIBLE);
-        mainmenuButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        mainmenuButton.setX(screenWidth*9/16);
+        mainmenuButton.setLayoutParams(new ViewGroup.LayoutParams(width*2, height*2));
+        mainmenuButton.setX(screenWidth/2 + width*3);
         mainmenuButton.setY(screenHeight/2);
-        mainmenuButton.setImageResource(android.R.drawable.ic_menu_revert);
+        mainmenuButton.setImageResource(R.drawable.home);
         mainmenuButton.setOnClickListener(v -> onMainMenuButtonClick(v));
         ((ViewGroup)findViewById(android.R.id.content)).addView(mainmenuButton);
 
         resumeTextView = new TextView(this);
         resumeTextView.setVisibility(View.INVISIBLE);
-        resumeTextView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        resumeTextView.setLayoutParams(new ViewGroup.LayoutParams(width*4, height));
         resumeTextView.setGravity(View.TEXT_ALIGNMENT_CENTER);
         resumeTextView.setTextColor(Color.WHITE);
-        resumeTextView.setTextSize(30);
+        resumeTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
         resumeTextView.setBackgroundColor(Color.TRANSPARENT);
-        resumeTextView.setX(screenWidth*9/32);
-        resumeTextView.setY(screenHeight/4);
+        resumeTextView.setX(screenWidth/2 - width*5);
+        resumeTextView.setY(screenHeight*5/16);
         resumeTextView.setText("계속하기");
+        resumeTextView.setPaintFlags(resumeTextView.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
         ((ViewGroup)findViewById(android.R.id.content)).addView(resumeTextView);
 
         resumeButton = new ImageButton(this);
         resumeButton.setVisibility(View.INVISIBLE);
-        resumeButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        resumeButton.setX(screenWidth*5/16);
+        resumeButton.setLayoutParams(new ViewGroup.LayoutParams(width*2, height*2));
+        resumeButton.setX(screenWidth/2 - width*4);
         resumeButton.setY(screenHeight/2);
-        resumeButton.setImageResource(android.R.drawable.ic_media_play);
+        resumeButton.setImageResource(R.drawable.resume);
         resumeButton.setOnClickListener(v -> onResumeButtonClick(v));
         ((ViewGroup)findViewById(android.R.id.content)).addView(resumeButton);
+
+//        countdownTextView = new TextView(this);
+//        countdownTextView.setVisibility(View.INVISIBLE);
+//        countdownTextView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+//        countdownTextView.setX(screenWidth/2 - countdownTextView.getLayoutParams().width/2);
+//        countdownTextView.setY(screenHeight/2 - countdownTextView.getLayoutParams().height/2);
+//        countdownTextView.setTextColor(Color.WHITE);
+//        countdownTextView.setTextSize(90);
+//        countdownTextView.setBackgroundColor(Color.TRANSPARENT);
+//        countdownTextView.setText("3");
+//        ((ViewGroup)findViewById(android.R.id.content)).addView(countdownTextView);
+
 
         View view = findViewById(R.id.deltaRelative);
         view.setOnTouchListener(new View.OnTouchListener() {
@@ -789,12 +810,12 @@ public class Choice extends AppCompatActivity {
 
     public void onResumeButtonClick(View view){
         pauseButton.setVisibility(View.VISIBLE);
-        isPaused = false;
-        menuview.setVisibility(View.INVISIBLE);
         mainmenuTextView.setVisibility(View.INVISIBLE);
         mainmenuButton.setVisibility(View.INVISIBLE);
         resumeTextView.setVisibility(View.INVISIBLE);
         resumeButton.setVisibility(View.INVISIBLE);
+        menuview.setVisibility(View.INVISIBLE);
+        isPaused = false;
         resumeMusic();
     }
 
@@ -1295,6 +1316,7 @@ public class Choice extends AppCompatActivity {
 
     public void SelectPattern(int select){ //여기에 패턴 만들고 패턴번호 붙이면 됨 사용은 maptemp에서 stagelevel list에 add(패턴숫자)하면 됨
 //        gs() 위/아래 , 거리 , 공중
+        System.out.println(select);
         switch (select){
 
             case 1:
@@ -1685,6 +1707,82 @@ public class Choice extends AppCompatActivity {
                 gs(true);
                 break;
 
+            case 21:
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(true, gashiSize * 3);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(false, gashiSize * 3);
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(true, gashiSize * 3);
+                gs(true);
+                gs(true);
+                gs(true);
+                break;
+
+            case 22:
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(false, gashiSize * 3);
+                gs(false);
+                gs(false);
+                gs(false);
+                gs(true, gashiSize * 3);
+                gs(true);
+                gs(true);
+                gs(true);
+                gs(false, gashiSize * 3);
+                gs(false);
+                gs(false);
+                gs(false);
+                break;
+
+            case 23:
+                gs(true);
+                gs(false, 0);
+                gs(true);
+                gs(false, 0);
+                gs(true);
+                gs(false, 0);
+                gs(true);
+                gs(false, 0);
+                gs(true);
+                gs(false, 0);
+                gs(true);
+                gs(false, 0);
+                gs(true);
+                gs(false, 0);
+                gs(true);
+                gs(false, 0);
+                gs(true);
+                gs(false, 0);
+                gs(true);
+                gs(false, 0);
+                gs(true);
+                gs(false, 0);
+                gs(true);
+                gs(false, 0);
+
+                ps(false, gashiSize, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                ps(false, gashiSize * 3, gashiSize*2);
+                ps(true, 0, gashiSize*2);
+                break;
+
+            default:
+                break;
         }
     }
 }//좀더 쉽게 코드를 짤 수 있어도 좋을듯 땅, 발판위 즉석코드같은거.

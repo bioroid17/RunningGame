@@ -27,10 +27,10 @@
 
     <ImageButton
         android:id="@+id/pause_button"
-        android:layout_width="69dp"
-        android:layout_height="69dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:contentDescription="score_description"
         android:onClick="onPauseButtonClick"
-        app:srcCompat="@android:drawable/ic_media_pause" />
+        app:srcCompat="@drawable/pause" />
 
 </RelativeLayout>
