@@ -33,6 +33,47 @@ public class ScoreActivity extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
+    public void onClickReset(View view){
+        ScoreManager sm = new ScoreManager(getApplicationContext());
+        sm.resetScore();
+        List<Integer> topScores = scoreManager.getTopScores();
+
+        for(int a: topScores){
+            System.out.println(a);
+        }
+
+        List<String> stringScores = new ArrayList<>();
+        int i=1;
+        for(Integer score : topScores) {
+            if(i==1) {
+                stringScores.add(i+ "st   " + String.valueOf(score));
+            }else if(i==2){
+                stringScores.add(i+ "nd   " + String.valueOf(score));
+            }else if(i==3){
+                stringScores.add(i+ "rd   " + String.valueOf(score));
+            }else{
+                stringScores.add(i+ "th   " + String.valueOf(score));
+            }
+            i++;
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stringScores) {
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView textView = (TextView) view;
+                textView.setTextColor(Color.WHITE);  // 텍스트 색상을 흰색으로 설정
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 40);  // 텍스트 크기를 20sp로 설정
+                textView.setGravity(Gravity.CENTER);
+                return view;
+            }
+        };
+
+        ListView listView = findViewById(R.id.score_list);
+        listView.setAdapter(adapter);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

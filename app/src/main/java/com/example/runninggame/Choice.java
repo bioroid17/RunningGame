@@ -4,49 +4,35 @@ import static com.example.runninggame.maptemp.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.media.MediaPlayer;
 import android.view.MotionEvent;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 public class Choice extends AppCompatActivity {
+
+    MediaPlayer deadPlayer;
     private ObjectAnimator animatorX;
     private ObjectAnimator animatorY;
     private boolean isAnimationPaused = false;
@@ -386,6 +372,48 @@ public class Choice extends AppCompatActivity {
 
 
     ///////////////
+
+    private MediaPlayer mediaPlayer;
+    private void playRandomMusic() {
+        if (mediaPlayer != null) {
+            mediaPlayer.release(); // 이전에 재생 중이던 음악 해제
+        }
+
+        // 랜덤 음악 선택
+        int musicResource = getRandomMusic();
+
+        mediaPlayer = MediaPlayer.create(this, musicResource);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.start();
+    }
+    private int preIndex = 999;
+    int randomIndex = 0;
+    private int getRandomMusic() {
+        String[] musicResources = {"run1", "run2", "run3", "main"};
+
+        randomIndex++;
+        if(randomIndex > 3) randomIndex = 0;
+
+        return getResources().getIdentifier(musicResources[randomIndex], "raw", getPackageName());
+    }
+    private void pauseMusic() {
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        }
+    }
+    private void resumeMusic() {
+        if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
+            mediaPlayer.start();
+        }
+    }
+    private void stopMusic() {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -393,6 +421,18 @@ public class Choice extends AppCompatActivity {
         setContentView(R.layout.activity_choice);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        MediaPlayerSingleton.getInstance(this).pause();
+
+        playRandomMusic();
+        deadPlayer = MediaPlayer.create(this, R.raw.dead);
+        deadPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+
+                deadPlayer.release();
+            }
+        });
 
         rootView = findViewById(android.R.id.content);
         random = new Random();
@@ -698,6 +738,9 @@ public class Choice extends AppCompatActivity {
         mainmenuButton.setVisibility(View.VISIBLE);
         resumeTextView.setVisibility(View.VISIBLE);
         resumeButton.setVisibility(View.VISIBLE);
+
+        MediaPlayerSingleton.getInstance(this).pause();
+        pauseMusic();
     }
     public void onRestartButtonClick(View view) {
         pauseButton.setVisibility(View.VISIBLE);
@@ -714,6 +757,15 @@ public class Choice extends AppCompatActivity {
         gameSpeedChange(0);
         translateY = 0;
 
+        deadPlayer = MediaPlayer.create(this, R.raw.dead);
+        deadPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+
+                deadPlayer.release();
+            }
+        });
+
         for(ImageView gashi : gashiPool){
             removeGashi(gashi);
         }
@@ -727,9 +779,12 @@ public class Choice extends AppCompatActivity {
         nextPatternHandler.post(nextPattern);
         isDead = false;
         score = 0;
+
+        playRandomMusic();
     }
     public void onMainMenuButtonClick(View view){
         finish();
+        stopMusic();
     }
 
     public void onResumeButtonClick(View view){
@@ -740,6 +795,7 @@ public class Choice extends AppCompatActivity {
         mainmenuButton.setVisibility(View.INVISIBLE);
         resumeTextView.setVisibility(View.INVISIBLE);
         resumeButton.setVisibility(View.INVISIBLE);
+        resumeMusic();
     }
 
     @Override
@@ -890,10 +946,18 @@ public class Choice extends AppCompatActivity {
 */
                     player.setVisibility(View.INVISIBLE);
                     spawnDeadEff();
+
+                    stopMusic();
+
+
+
+                    deadPlayer.start();
+
                 }
             }
         }
     }
+
 
 
     private void reversal(){ //반전 눌렀을때 값들 반전됨

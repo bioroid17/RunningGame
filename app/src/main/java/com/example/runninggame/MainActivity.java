@@ -49,12 +49,15 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
         maptemp.setmap();
+        mediaPlayer = MediaPlayerSingleton.getInstance(this);
         scoreManager = new ScoreManager(this);
         rootView = findViewById(android.R.id.content);
         random = new Random();
@@ -76,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
 
         // TextView 객체를 참조합니다.
         TextView textView = findViewById(R.id.my_text_view);
@@ -156,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             public void onAnimationRepeat(Animation animation) {}
         });
 
-        mediaPlayer = MediaPlayer.create(this, R.raw.sillychipsong);
+        //mediaPlayer = MediaPlayer.create(this, R.raw.sillychipsong);
         mediaPlayer.setLooping(true);
     }
 
@@ -204,7 +206,10 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onResume() {
         super.onResume();
-        if (mediaPlayer != null) {
+        int firstscore=scoreManager.firstScore();
+        TextView firstScore= findViewById(R.id.firstscore);
+        firstScore.setText("High Score \n" + firstscore);  // 텍스트 변경
+        if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
             mediaPlayer.start();
         }
     }
@@ -212,24 +217,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (mediaPlayer != null) {
+        /*if (mediaPlayer != null) {
             mediaPlayer.pause();
-        }
+        }*/
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
+        MediaPlayerSingleton.release();
+
     }
 
     public void onClickNEXT(View view) {
+        mediaPlayer.pause();
         Intent NEXT = new Intent(MainActivity.this, Choice.class);
+        NEXT.putExtra("stopMusic", true);
         startActivity(NEXT);
     }
+
 
     public void onClickSet(View view) {
         Intent NEXT = new Intent(MainActivity.this, Setting.class);

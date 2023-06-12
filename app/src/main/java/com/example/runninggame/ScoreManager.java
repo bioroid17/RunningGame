@@ -2,6 +2,7 @@ package com.example.runninggame;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,26 +19,12 @@ public class ScoreManager {
         editor = prefs.edit();
     }
 
-    public void saveScore(int newScore) {
-
-        String allScoresString = prefs.getString(KEY_SCORES, "");
+    public void resetScore(){
         List<Integer> allScores = new ArrayList<>();
-        if (!allScoresString.isEmpty()) {
-            String[] scoresArray = allScoresString.split(",");
-            for (String score : scoresArray) {
-                allScores.add(Integer.parseInt(score));
-            }
-        }
 
-        // 스코어 더함
-        allScores.add(newScore);
-
-        // 내림차순 정렬
-        Collections.sort(allScores, Collections.reverseOrder());
-
-        // 10개까지 저장
-        while (allScores.size() > 10) {
-            allScores.remove(allScores.size() - 1);
+        // 10개의 0으로 초기화된 점수 생성
+        for (int i = 0; i < 10; i++) {
+            allScores.add(0);
         }
 
         // 스트링 형태로 변환
@@ -52,6 +39,44 @@ public class ScoreManager {
         // 저장
         editor.putString(KEY_SCORES, allScoresStringBuilder.toString());
         editor.commit();
+    }
+
+    public void saveScore(int newScore) {
+
+        String allScoresString = prefs.getString(KEY_SCORES, "");
+        List<Integer> allScores = new ArrayList<>();
+        if (!allScoresString.isEmpty()) {
+            String[] scoresArray = allScoresString.split(",");
+            for (String score : scoresArray) {
+                allScores.add(Integer.parseInt(score));
+            }
+        }
+
+        if (!allScores.contains(newScore)) {
+            // 스코어 더함
+            allScores.add(newScore);
+
+            // 내림차순 정렬
+            Collections.sort(allScores, Collections.reverseOrder());
+
+            // 10개까지 저장
+            while (allScores.size() > 10) {
+                allScores.remove(allScores.size() - 1);
+            }
+
+            // 스트링 형태로 변환
+            StringBuilder allScoresStringBuilder = new StringBuilder();
+            for (int i = 0; i < allScores.size(); i++) {
+                allScoresStringBuilder.append(allScores.get(i));
+                if (i < allScores.size() - 1) {
+                    allScoresStringBuilder.append(",");
+                }
+            }
+
+            // 저장
+            editor.putString(KEY_SCORES, allScoresStringBuilder.toString());
+            editor.apply();
+        }
     }
 
     public List<Integer> getTopScores() {
