@@ -399,7 +399,7 @@ public class Choice extends AppCompatActivity {
     }
     int randomIndex = 0;
     private int getRandomMusic() {
-        String[] musicResources = {"run1", "run2", "run3", "main"};
+        String[] musicResources = {"run3", "run1", "run2", "main"};
 
         randomIndex++;
         if(randomIndex > 3) randomIndex = 0;
@@ -651,17 +651,19 @@ public class Choice extends AppCompatActivity {
 
             switch (action) {
                 case MotionEvent.ACTION_DOWN:
-                    if (y > screenHeight / 5) {
-                        if (x < screenWidth / 2) { //왼쪽 터치
-                            if(isRever == false) {
-                                reversal();
-                                isRever = true;
-                                reverint = pointerId;
-                            }
-                        } else {
-                            if(jumpPress == false) {
-                                jumpPress = true;
-                                jumpint = pointerId;
+                    if(!isPaused) {
+                        if (y > screenHeight / 5) {
+                            if (x < screenWidth / 2) { //왼쪽 터치
+                                if (isRever == false) {
+                                    reversal();
+                                    isRever = true;
+                                    reverint = pointerId;
+                                }
+                            } else {
+                                if (jumpPress == false) {
+                                    jumpPress = true;
+                                    jumpint = pointerId;
+                                }
                             }
                         }
                     }
@@ -855,6 +857,7 @@ public class Choice extends AppCompatActivity {
         nextPatternHandler.post(nextPattern);
         isDead = false;
         score = 0;
+        scoree = 0;
 
         playRandomMusic();
     }
