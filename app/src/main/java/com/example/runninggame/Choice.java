@@ -4,7 +4,9 @@ import static com.example.runninggame.maptemp.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.util.TypedValue;
 import android.media.MediaPlayer;
 import android.view.MotionEvent;
@@ -29,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -41,6 +44,10 @@ public class Choice extends AppCompatActivity {
     private ObjectAnimator animatorY;
     private boolean isAnimationPaused = false;
     private ViewGroup rootView; //눈 이미지 그룹
+    View view;
+    int jumpint;
+    int reverint;
+    boolean isRever = false;
     private Random random;
     static int maplevel=0; //0스테이지부터 ~
     static int patNum=0;
@@ -89,7 +96,7 @@ public class Choice extends AppCompatActivity {
     boolean jumpPress = false;
 
     int jumphei = platY * 2; //최대 점프 높이
-    float gameSpeed = 1f;
+    float gameSpeed = 0.9f;
     float B = 15f/gameSpeed; //공중정지까지 걸리는 시간. 게임속도와 반비례
     float A = 2 * jumphei / B;; //시작 속력
 
@@ -218,7 +225,7 @@ public class Choice extends AppCompatActivity {
             boolean randomY = random.nextBoolean();
             if(randomX) quakeX = quakeCurPower; else quakeX = -quakeCurPower;
             if(randomY) quakeY = quakeCurPower; else quakeY = -quakeCurPower;
-            quakeCurPower -= gameSpeed;
+            quakeCurPower--;
             if(quakeCurPower <= 0) {quakeCurPower = 0; quakeX = 0; quakeY = 0;}
             ground.setX(ground.getX()+quakeX); ground.setY(ground.getY()+quakeY);
             if(gashiPoolStart < gashiPoolEnd) {
@@ -365,7 +372,7 @@ public class Choice extends AppCompatActivity {
             speedUpCount++;
             if(speedUpCount >= speedUpNum){
                 speedUpCount = 0;
-                gameSpeedChange(0.08f);
+                gameSpeedChange(0.1f);
             }
 
             pattern();
@@ -381,17 +388,15 @@ public class Choice extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private void playRandomMusic() {
         if (mediaPlayer != null) {
-            mediaPlayer.release(); // 이전에 재생 중이던 음악 해제
+            mediaPlayer.release();
         }
 
-        // 랜덤 음악 선택
         int musicResource = getRandomMusic();
 
         mediaPlayer = MediaPlayer.create(this, musicResource);
         mediaPlayer.setLooping(true);
         mediaPlayer.start();
     }
-    private int preIndex = 999;
     int randomIndex = 0;
     private int getRandomMusic() {
         String[] musicResources = {"run1", "run2", "run3", "main"};
@@ -427,17 +432,20 @@ public class Choice extends AppCompatActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
+        view = findViewById(R.id.deltaRelative);
+
         MediaPlayerSingleton.getInstance(this).pause();
 
         playRandomMusic();
+
         deadPlayer = MediaPlayer.create(this, R.raw.dead);
         deadPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-
                 deadPlayer.release();
             }
         });
+
 
         rootView = findViewById(android.R.id.content);
         random = new Random();
@@ -624,36 +632,91 @@ public class Choice extends AppCompatActivity {
 //        ((ViewGroup)findViewById(android.R.id.content)).addView(countdownTextView);
 
 
-        View view = findViewById(R.id.deltaRelative);
-        view.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event){
-                int screenWidth = v.getWidth();
-                int screenHeight = v.getHeight();
-                float touchX = event.getX();
-                float touchY = event.getY();
 
-                if(!isDead && !isPaused) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        if (touchY > screenHeight / 5) {
-                            if (touchX < screenWidth / 2) { //왼쪽 터치
+
+
+
+    }
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int action = event.getActionMasked();
+        int pointerCount = event.getPointerCount();
+
+        for (int i = 0; i < pointerCount; i++) {
+            int pointerId = event.getPointerId(i);
+            float x = event.getX(i);
+            float y = event.getY(i);
+            int screenWidth = view.getWidth();
+            int screenHeight = view.getHeight();
+
+            switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    if (y > screenHeight / 5) {
+                        if (x < screenWidth / 2) { //왼쪽 터치
+                            if(isRever == false) {
                                 reversal();
-                            } else {
+                                isRever = true;
+                                reverint = pointerId;
+                            }
+                        } else {
+                            if(jumpPress == false) {
                                 jumpPress = true;
+                                jumpint = pointerId;
                             }
                         }
                     }
-                    if(event.getAction() == MotionEvent.ACTION_UP) {
-                        if (touchY > screenHeight / 5) {
-                            if (touchX > screenWidth / 2) {
+                    break;
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    if (y > screenHeight / 5) {
+                        if(isRever == false) {
+                            reversal();
+                            isRever = true;
+                            reverint = pointerId;
+                        } else {
+                            if(jumpPress == false) {
+                                jumpPress = true;
+                                jumpint = pointerId;
+                            }
+                        }
+                    }
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if(pointerId == jumpint){
+                        if(x < screenWidth/2){
+                            jumpPress = false;
+                            jumpint = 99999;
+                        }
+                    }
+                    if(pointerId == reverint){
+                        if(x > screenWidth/2){
+                            isRever = false;
+                            reverint = 99999;
+                        }
+                    }
+                    break;
+                case MotionEvent.ACTION_POINTER_UP:
+
+                            if(pointerId == jumpint) {
                                 jumpPress = false;
                             }
-                        }
-                    }
-                }
-                return true;
-            }
-        });
+                            if(pointerId == reverint){
+                                isRever = false;
+                            }
 
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if(pointerId == jumpint) {
+                        jumpPress = false;
+                    }
+                    if(pointerId == reverint){
+                        isRever = false;
+                    }
+                    break;
+
+            }
+        }
+
+        return true;
     }
 
     private void animateSnowflake(final ImageView snowflake) {
@@ -774,18 +837,9 @@ public class Choice extends AppCompatActivity {
         player.setY(groundY - ground.getHeight()/2f - player.getHeight());
         isreversal = false;
         speedUpCount = -1;
-        gameSpeed = 1f;
+        gameSpeed = 0.9f;
         gameSpeedChange(0);
         translateY = 0;
-
-        deadPlayer = MediaPlayer.create(this, R.raw.dead);
-        deadPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-
-                deadPlayer.release();
-            }
-        });
 
         for(ImageView gashi : gashiPool){
             removeGashi(gashi);
@@ -822,6 +876,10 @@ public class Choice extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (deadPlayer != null) {
+            deadPlayer.release();
+            deadPlayer = null;
+        }
         timer.cancel();
     }
 
@@ -972,13 +1030,27 @@ public class Choice extends AppCompatActivity {
 
 
 
-                    deadPlayer.start();
+                    playDeadSound();
 
                 }
             }
         }
     }
-
+    private void playDeadSound() {
+        if (deadPlayer != null) {
+            deadPlayer.release();
+        }
+        deadPlayer = new MediaPlayer();
+        try {
+            AssetFileDescriptor descriptor = getResources().openRawResourceFd(R.raw.dead);
+            deadPlayer.setDataSource(descriptor.getFileDescriptor(), descriptor.getStartOffset(), descriptor.getLength());
+            descriptor.close();
+            deadPlayer.prepare();
+            deadPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     private void reversal(){ //반전 눌렀을때 값들 반전됨
