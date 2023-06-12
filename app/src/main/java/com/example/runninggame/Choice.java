@@ -63,7 +63,7 @@ public class Choice extends AppCompatActivity {
     private ImageButton restartButton;
     private ImageButton mainmenuButton;
     private ImageButton resumeButton;
-
+    private int customPattern = 0;
     ScoreManager scoreManager;
     private boolean isPaused = false;
     private boolean isDead = false;
@@ -795,23 +795,24 @@ public class Choice extends AppCompatActivity {
             }
         });
     }
-
+    float scoree;
     private void startTimer() {
         timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 if (!isPaused && !isDead) {
-                    score++;
+                    scoree += gameSpeed;
+                    score = (int)scoree;
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            scoreTextView.setText("Score: " + score + "   Game Speed " + Math.round(gameSpeed*100)/100.0f);
+                            scoreTextView.setText("Score: " + score);
                         }
                     });
                 }
             }
-        }, 100, 100); // 0.1초마다 실행
+        }, 100, 50);
     }
 
     public void onPauseButtonClick(View view) {
@@ -1091,7 +1092,7 @@ public class Choice extends AppCompatActivity {
                 return true;
             }
             if(keyCode == KeyEvent.KEYCODE_W){
-                gameSpeedChange(-0.03f);
+                customPattern++;
                 return true;
             }
             if(keyCode == KeyEvent.KEYCODE_E){
@@ -1351,7 +1352,7 @@ public class Choice extends AppCompatActivity {
         patternCount++;
         isPatternOut.set(patternNum, true);
         if(patternCount > patternSize) {patternCount = 0; for(int i = 0; i <= patternSize; i++) {isPatternOut.set(i, false);}}
-        //patternNum = 9; //6번 가시 하나 줄이기
+        //patternNum = customPattern; //6번 가시 하나 줄이기
         SelectPattern(patternNum);
         previousPattern = patternNum;
         SpawnObj();
@@ -1459,8 +1460,6 @@ public class Choice extends AppCompatActivity {
                 gs(true,0);
                 gs(false);
                 gs(true,0);
-                gs(false);
-                gs(true,0);
                 gs(true);
                 break;
             case 5:
@@ -1481,16 +1480,21 @@ public class Choice extends AppCompatActivity {
                 gs(false);
                 gs(true,0);
                 ps(false,gashiSize*4,gashiSize*4);
+                hps(false,gashiSize*2,gashiSize*4);
                 gs(false);
                 gs(true,0);
                 gs(false);
                 gs(true,0);
                 gs(false);
+                hUp(false,0);
                 gs(true,0);
                 gs(false);
+                hUp(false,0);
                 gs(true,0);
                 gs(true);
+                hUp(false,0);
                 gs(true);
+                hUp(false,0);
                 gs(true);
                 gs(true);
                 gs(true);
@@ -1499,8 +1503,6 @@ public class Choice extends AppCompatActivity {
                 gs(false);
                 gs(false);
                 gs(false);
-                gs(false);
-                gs(true,0);
                 gs(false);
                 gs(true,0);
                 gs(true);
@@ -1550,20 +1552,50 @@ public class Choice extends AppCompatActivity {
 
             case 8:
                 gs(false);gs(false);gs(false);
-                ps(false,gashiSize*4,gashiSize*4);
+                ps(false,gashiSize*4,gashiSize*2);
+                ps(true,0,gashiSize*2);
                 gs(false);gs(true,0);
                 gs(false);gs(true,0);
                 gs(false);gs(true,0);
-                gs(false);gs(true,0);
-                gs(false);gs(true,0);
-                gs(false);gs(true,0);
-                ps(true,gashiSize*6,gashiSize*4);
-                gs(false);gs(true,0);
-                gs(false);gs(true,0);
-                gs(false);gs(true,0);
-                gs(false);gs(true,0);
-                gs(false);gs(true,0);
-                gs(false);gs(true,0);
+                gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);
+                ps(true,gashiSize*7,gashiSize*2);
+                ps(false,0,gashiSize*2);
+                ps(true,gashiSize*7,gashiSize*2);
+                ps(false,0,gashiSize*2);
+                ps(true,gashiSize*7,gashiSize*2);
+                ps(false,0,gashiSize*2);ps(true,gashiSize*7,gashiSize*2);
+                ps(false,0,gashiSize*2);ps(true,gashiSize*7,gashiSize*2);
+                ps(false,0,gashiSize*2);ps(true,gashiSize*7,gashiSize*2);
+                ps(false,0,gashiSize*2);ps(true,gashiSize*7,gashiSize*2);
+                ps(false,0,gashiSize*2);ps(true,gashiSize*7,gashiSize*2);
+                ps(false,0,gashiSize*2);ps(true,gashiSize*7,gashiSize*2);
+                ps(false,0,gashiSize*2);
+                gs(false);gs(true,0);gs(false,0,0);
+                gs(false);gs(true,0);gs(false,0,0);
+                gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);
+                gs(false);gs(true,0);gs(true,0,0);
+                gs(false);gs(true,0);gs(true,0,0);
+                gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);
+                gs(false);gs(true,0);gs(true,0,0);
+                gs(false);gs(true,0);gs(true,0,0);
+                gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);
+                gs(false);gs(true,0);gs(false,0,0);
+                gs(false);gs(true,0);gs(false,0,0);
+                gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);
+                gs(false);gs(true,0);gs(true,0,0);
+                gs(false);gs(true,0);gs(true,0,0);
+                gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);
+                gs(false);gs(true,0);gs(false,0,0);
+                gs(false);gs(true,0);gs(false,0,0);
+                gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);
+                gs(false);gs(true,0);gs(true,0,0);
+                gs(false);gs(true,0);gs(true,0,0);
+                gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);
+                gs(false);gs(true,0);gs(false,0,0);
+                gs(false);gs(true,0);gs(false,0,0);
+                gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);gs(false);gs(true,0);
+                gs(false);gs(true,0);gs(false,0,0);
+                gs(false);gs(true,0);gs(false,0,0);
                 gs(false);gs(false);gs(false);
                 break;
 
@@ -1576,13 +1608,15 @@ public class Choice extends AppCompatActivity {
                 gs(false);
                 gs(true,0);
                 gs(true);gs(true);gs(true);gs(true);
-                ps(false,gashiSize*10,gashiSize*5);
+                ps(false,gashiSize*12,gashiSize*5);
                 gs(false);
                 gs(true,0);
                 gs(false);
                 gs(true,0);
                 gs(false);
                 gs(true,0);
+                gs(false);gs(true,0);
+                gs(false);gs(true,0);
                 gs(false);
                 gs(false,0,0);
                 gs(true,0);
@@ -1612,8 +1646,8 @@ public class Choice extends AppCompatActivity {
                 break;
             case 10: //반 반~ 반~ 반~ 반~ 반~ 반~ 반 반 반
                 ps(true,0,gashiSize); ps(false,0,gashiSize);
-                for(int i = 0; i < 15; i++){ps(true, gashiSize*4, gashiSize); ps(false, 0, gashiSize);}
-                for(int i = 0; i < 3; i++){gs(false,0,0);gs(false,0,1);gs(true,0,0); gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(true,0,0);gs(true,0,1);gs(false,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0);} gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0);gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0);
+                for(int i = 0; i < 11; i++){ps(true, gashiSize*4, gashiSize); ps(false, 0, gashiSize);}
+                for(int i = 0; i < 2; i++){gs(false,0,0);gs(false,0,1);gs(true,0,0); gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(true,0,0);gs(true,0,1);gs(false,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0);} gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0); gs(false,gashiSize*4,0);gs(false,0,1);gs(true,0,0);gs(true,gashiSize*4,0);gs(true,0,1);gs(false,0,0);
                 break;
             case 11: //반점 점 점 반점 반or점반
                 ps(true, gashiSize, gashiSize*10); ps(true, gashiSize*10, gashiSize*2); ps(true, gashiSize*2, gashiSize*6); ps(false, gashiSize*10, gashiSize*3); ps(false, gashiSize*9, gashiSize*5); ps(true, gashiSize*7, gashiSize*4);
@@ -1632,24 +1666,24 @@ public class Choice extends AppCompatActivity {
                 gs(false, gashiSize*8); hDown(false, gashiSize); gs(true, 0);  gs(false); hDown(false, gashiSize);  gs(false); hDown(true, 0); hDown(false, gashiSize); hDown(true, gashiSize); hDown(true, gashiSize*2); hDown(true, gashiSize*2); gs(true, 0); gs(false, 0);
                 break;
             case 14: //반점 반점 반점 점 점 반점
-                ps(false, 0,gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(true, gashiSize*9, gashiSize*2);
+                ps(false, 0,gashiSize*2); ps(true, gashiSize*7, gashiSize*2); ps(false, gashiSize*7, gashiSize*2); ps(false, gashiSize*7, gashiSize*2); ps(false, gashiSize*7, gashiSize*2); ps(true, gashiSize*7, gashiSize*2);
                 gs(false, 0, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
-                gs(true, gashiSize*8, 0); gs(true, 0, 1); gs(false, 0); gs(false); gs(true, 0, 0); gs(true, 0, 1);
-                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
-                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
-                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
-                gs(true, gashiSize*8, 0); gs(true, 0, 1); gs(false, 0); gs(false); gs(true, 0, 0); gs(true, 0, 1);
+                gs(true, gashiSize*6, 0); gs(true, 0, 1); gs(false, 0); gs(false); gs(true, 0, 0); gs(true, 0, 1);
+                gs(false, gashiSize*6, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
+                gs(false, gashiSize*6, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
+                gs(false, gashiSize*6, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
+                gs(true, gashiSize*6, 0); gs(true, 0, 1); gs(false, 0); gs(false); gs(true, 0, 0); gs(true, 0, 1);
 
                 break;
             case 15: //가만히 반 점 반 반 반점 반점
-                ps(true, 0, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, 0, gashiSize*2); ps(false, gashiSize*9, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*9, gashiSize*2); ps(false, gashiSize*9, gashiSize*2);
+                ps(true, 0, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*5, gashiSize*2); ps(false, 0, gashiSize*2); ps(false, gashiSize*7, gashiSize*2); ps(true, gashiSize*5, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*5, gashiSize*2); ps(false, 0, gashiSize*2); ps(true, gashiSize*7, gashiSize*2); ps(false, gashiSize*7, gashiSize*2);
                 gs(true, 0, 0); gs(true, 0, 1); gs(false, 0, 0); gs(false, gashiSize, 0); gs(true, 0, 0); gs(true, 0, 1);
-                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0, 0); gs(true, gashiSize, 0); gs(false, 0, 0); gs(false, 0, 1);
-                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
-                gs(true, gashiSize*8, 0); gs(true, 0, 1); gs(false, 0, 0); gs(false, gashiSize, 0); gs(true, 0, 0); gs(true, 0, 1);
-                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0, 0); gs(true, gashiSize, 0); gs(false, 0, 0); gs(false, 0, 1);
-                gs(true, gashiSize*8, 0); gs(true, 0, 1); gs(false, 0); gs(false); gs(true, 0, 0); gs(true, 0, 1);
-                gs(false, gashiSize*8, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
+                gs(false, gashiSize*4, 0); gs(false, 0, 1); gs(true, 0, 0); gs(true, gashiSize, 0); gs(false, 0, 0); gs(false, 0, 1);
+                gs(false, gashiSize*6, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
+                gs(true, gashiSize*4, 0); gs(true, 0, 1); gs(false, 0, 0); gs(false, gashiSize, 0); gs(true, 0, 0); gs(true, 0, 1);
+                gs(false, gashiSize*4, 0); gs(false, 0, 1); gs(true, 0, 0); gs(true, gashiSize, 0); gs(false, 0, 0); gs(false, 0, 1);
+                gs(true, gashiSize*6, 0); gs(true, 0, 1); gs(false, 0); gs(false); gs(true, 0, 0); gs(true, 0, 1);
+                gs(false, gashiSize*6, 0); gs(false, 0, 1); gs(true, 0); gs(true); gs(false, 0, 0); gs(false, 0, 1);
 
 
                 break;
@@ -1667,7 +1701,7 @@ public class Choice extends AppCompatActivity {
                 gs(false); gs(true, 0); gs(true, 0, 0);
 
                 for(int j = 0; j < 3; j++) {
-                    for (int i = 0; i < 5; i++) {
+                    for (int i = 0; i < 4; i++) {
                         gs(false);
                         gs(true, 0);
                     }
@@ -1676,7 +1710,7 @@ public class Choice extends AppCompatActivity {
                         gs(true, 0);
                         gs(false, 0, 0);
                     }
-                    for (int i = 0; i < 5; i++) {
+                    for (int i = 0; i < 4; i++) {
                         gs(false);
                         gs(true, 0);
                     }
@@ -1689,7 +1723,7 @@ public class Choice extends AppCompatActivity {
                 ps(false, 0, gashiSize*3);
                 ps(true, 0, gashiSize*3);
                 for(int i = 0; i < 6; i++){
-                    ps(true, 800, gashiSize*3);
+                    ps(true, gashiSize*7, gashiSize*3);
                     ps(false, 0, gashiSize*3);
                 }
                 //ps(true, 10000, 100);
@@ -1754,7 +1788,7 @@ public class Choice extends AppCompatActivity {
                 gs(false,0);
                 gs(true);
                 gs(false,0);
-                ps(false,gashiSize*7,gashiSize*4);
+                ps(false,gashiSize*7,gashiSize*5);
                 gs(true);
                 gs(false,0);
                 gs(true);
@@ -1770,11 +1804,11 @@ public class Choice extends AppCompatActivity {
                 gs(false,0,gashiSize*2+50,false);
                 gs(true);
                 gs(false,0,gashiSize*2+50,false);
-                gs(true);
                 gs(false,0);
+                gs(false,gashiSize/2);
+                gs(true, gashiSize/2);
                 gs(false,0,gashiSize*2+50,false);
                 gs(true);
-                gs(false,0);
                 gs(false,0,gashiSize*2+50,false);
                 gs(true);
                 break;
@@ -1785,13 +1819,17 @@ public class Choice extends AppCompatActivity {
                 gs(false);
                 gs(false);
                 gs(true, gashiSize * 3);
+                gs(false,0);
                 gs(true);
+                gs(false,0);
                 gs(true);
-                gs(true);
-                gs(false, gashiSize * 3);
+                gs(false,0);
+                gs(false, (int)(gashiSize * 3.5f));
+                gs(true,0);
                 gs(false);
+                gs(true,0);
                 gs(false);
-                gs(false);
+                gs(true,0);
                 gs(true, gashiSize * 3);
                 gs(true);
                 gs(true);
